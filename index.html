@@ -11,24 +11,15 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{width:100%;height:var(--app-height);min-height:var(--app-height);overflow:hidden;touch-action:manipulation;-webkit-text-size-adjust:100%}
 body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#4a3f35;background:#77d6ff}
-.app{position:fixed;top:0;left:0;right:0;width:100%;height:var(--app-height);overflow:hidden;background-image:url("assets/bg_road_day.png"),linear-gradient(#75d7ff 0 42%,#8ddd65 42% 48%,#b8b8b8 48% 100%);background-size:cover,100% 100%;background-position:center,center}
-.app:before{content:"";position:absolute;left:0;right:0;top:68%;height:18px;background:repeating-linear-gradient(90deg,transparent 0 70px,#fff 70px 130px,transparent 130px 200px);opacity:.9}
-.cloud{position:absolute;background:white;border-radius:999px;opacity:.9}
-.cloud:before,.cloud:after{content:"";position:absolute;border-radius:50%;background:white}
-.c1{left:9%;top:9%;width:130px;height:50px}
-.c1:before{width:55px;height:55px;left:25px;top:-25px}
-.c1:after{width:50px;height:50px;right:22px;top:-18px}
-.c2{right:11%;top:12%;width:120px;height:44px}
-.c2:before{width:50px;height:50px;left:22px;top:-23px}
-.c2:after{width:46px;height:46px;right:22px;top:-14px}
+.app{position:fixed;top:0;left:0;right:0;width:100%;height:var(--app-height);overflow:hidden;background-image:url("assets/bg_road_day.png"),linear-gradient(#75d7ff 0 42%,#8ddd65 42% 48%,#b8b8b8 48% 100%);background-size:100% 100%,100% 100%;background-position:center,center;background-repeat:no-repeat}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;min-height:0}
 .hide{display:none!important}
-.title{justify-content:center;gap:clamp(10px,2.6svh,22px);padding:max(8px,calc(env(safe-area-inset-top) + 1svh)) max(18px,calc(env(safe-area-inset-right) + 5vw)) max(8px,calc(env(safe-area-inset-bottom) + 1svh)) max(18px,calc(env(safe-area-inset-left) + 5vw));background:rgba(255,255,255,.18)}
+.title{justify-content:center;gap:clamp(10px,2.5svh,22px);padding:max(8px,calc(env(safe-area-inset-top) + 1svh)) max(18px,calc(env(safe-area-inset-right) + 5vw)) max(8px,calc(env(safe-area-inset-bottom) + 1svh)) max(18px,calc(env(safe-area-inset-left) + 5vw))}
 .logo{display:grid;place-items:center;line-height:.95;text-align:center}
 .logoImg{display:none;width:min(72vw,520px);max-height:34svh;object-fit:contain;filter:drop-shadow(0 9px 8px rgba(0,0,0,.18))}
 .logoImg.ready{display:block}
-.logoText{font-weight:900;font-size:clamp(34px,8.5vw,76px);letter-spacing:0;text-shadow:0 4px 0 #fff,4px 0 0 #fff,-4px 0 0 #fff,0 -4px 0 #fff,0 9px 10px rgba(0,0,0,.16)}
-.logoText.off{display:none}
+.logoText{display:none;font-weight:900;font-size:clamp(34px,8.5vw,76px);letter-spacing:0;text-shadow:0 4px 0 #fff,4px 0 0 #fff,-4px 0 0 #fff,0 -4px 0 #fff,0 9px 10px rgba(0,0,0,.16)}
+.logoText.ready{display:inline-block}
 .logoText span:nth-child(1){color:#ef3f26}
 .logoText span:nth-child(2){color:#1d78d6}
 .logoText span:nth-child(3){color:#43ad36}
@@ -39,22 +30,22 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .start:before{content:"";position:absolute;inset:10%;border-radius:50%;background:rgba(255,255,255,.18)}
 .playIcon{position:relative;left:4%;width:0;height:0;border-top:clamp(16px,3.8svh,26px) solid transparent;border-bottom:clamp(16px,3.8svh,26px) solid transparent;border-left:clamp(25px,5.8svh,40px) solid #fff;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15))}
 .start:active{transform:translateY(4px);box-shadow:0 2px 0 #ad301a}
-.play{display:grid;grid-template-rows:auto minmax(64px,.72fr) minmax(128px,1.28fr);justify-items:center;align-items:center;row-gap:max(3px,.7svh);padding:max(6px,1.4svh) max(12px,calc(env(safe-area-inset-right) + 2.4vw)) max(8px,calc(env(safe-area-inset-bottom) + 1.2svh)) max(12px,calc(env(safe-area-inset-left) + 2.4vw))}
-.msg{z-index:5;max-width:min(92vw,820px);font-size:clamp(14px,2.7vw,24px);padding:.24em .9em}
+.play{position:absolute;inset:0;padding:max(6px,1.4svh) max(12px,calc(env(safe-area-inset-right) + 2.4vw)) max(8px,calc(env(safe-area-inset-bottom) + 1.2svh)) max(12px,calc(env(safe-area-inset-left) + 2.4vw))}
+.msg{position:absolute;z-index:5;top:max(5px,calc(env(safe-area-inset-top) + 1svh));left:50%;transform:translateX(-50%);max-width:min(92vw,820px);font-size:clamp(14px,2.7vw,24px);padding:.24em .9em}
 .msg:empty{opacity:0;padding:0;border:0;box-shadow:none}
-.sampleLane,.choiceLane{width:100%;min-height:0;display:flex;align-items:center;justify-content:center}
-.sampleLane{height:100%}
-.choiceLane{height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,26px);align-items:end;justify-items:center;padding-bottom:max(2px,.6svh)}
+.sampleLane,.choiceLane{position:absolute;left:max(12px,calc(env(safe-area-inset-left) + 2.4vw));right:max(12px,calc(env(safe-area-inset-right) + 2.4vw));min-height:0}
+.sampleLane{top:clamp(45px,16svh,123px);height:clamp(96px,36svh,230px);display:flex;align-items:end;justify-content:center;pointer-events:none}
+.choiceLane{bottom:max(6px,calc(env(safe-area-inset-bottom) + 1svh));height:clamp(112px,44svh,260px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,26px);align-items:end;justify-items:center}
 .car{display:block;width:clamp(104px,24vw,230px);height:auto;aspect-ratio:320/230;filter:drop-shadow(0 8px 4px rgba(0,0,0,.16));pointer-events:none}
 .assetImg{display:none!important;width:100%;height:100%;object-fit:contain}
 .assetImg.ready{display:block!important}
-.fallbackSvg{display:block;width:100%;height:100%}
-.fallbackSvg.off{display:none!important}
+.fallbackSvg{display:none;width:100%;height:100%}
+.fallbackSvg.ready{display:block}
 .sample .car{width:clamp(104px,24vw,230px)}
-.choice{width:min(100%,clamp(126px,26vw,260px));height:100%;max-height:190px;min-height:96px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;border-radius:24px;padding:clamp(6px,1.4svh,14px) clamp(8px,1.6vw,18px);cursor:pointer}
+.choice{width:min(100%,clamp(126px,26vw,260px));height:100%;max-height:190px;min-height:96px;display:flex;align-items:end;justify-content:center;border:0;background:transparent;border-radius:24px;padding:clamp(6px,1.4svh,14px) clamp(8px,1.6vw,18px);cursor:pointer}
 .choice .car{width:clamp(100px,21vw,220px);max-height:100%}
-.enter{animation:choiceDrive 1.2s cubic-bezier(.18,.9,.26,1) both;animation-delay:calc(var(--i,0)*.22s)}
-.sampleIn{animation:sampleDrive 1.45s cubic-bezier(.18,.92,.28,1) both}
+.enter{animation:choiceDrive 2.4s cubic-bezier(.18,.9,.26,1) both;animation-delay:calc(var(--i,0)*.35s)}
+.sampleIn{animation:sampleDrive 2.9s cubic-bezier(.18,.92,.28,1) both}
 .wiggle{animation:becon .5s ease}
 .jump{animation:jump .72s cubic-bezier(.2,1.4,.35,1)}
 .fade{opacity:.25;transform:scale(.88);transition:.3s}
@@ -66,9 +57,10 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
   .logoText{font-size:clamp(30px,7.6vw,64px)}
   .lead{font-size:clamp(14px,2.7vw,22px);padding:.3em 1em}
   .start{width:clamp(64px,17svh,92px);height:clamp(64px,17svh,92px)}
-  .play{grid-template-rows:auto minmax(58px,.62fr) minmax(118px,1.38fr);row-gap:3px;padding-top:5px}
+  .play{padding-top:5px}
   .msg{font-size:clamp(13px,2.5vw,21px);padding:.22em .85em}
-  .sampleLane{align-items:flex-start}
+  .sampleLane{top:clamp(43px,16svh,58px);height:clamp(96px,36svh,130px)}
+  .choiceLane{height:clamp(112px,44svh,160px)}
   .sample .car{width:clamp(92px,19vw,164px)}
   .choice{min-height:92px;max-height:160px;padding:5px clamp(6px,1.2vw,12px)}
   .choice .car{width:clamp(96px,20vw,200px)}
@@ -82,8 +74,8 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 </style>
 </head>
 <body>
-<div class="app" id="app"><div class="cloud c1"></div><div class="cloud c2"></div>
-<section class="screen title" id="title"><h1 class="logo"><img class="logoImg" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" onload="this.classList.add('ready');this.nextElementSibling.classList.add('off')" onerror="this.remove()"><span class="logoText"><span>くるま</span><span>どれ</span><span>かな?</span></span></h1><p class="lead" aria-hidden="true"></p><button class="start" id="start" aria-label="はじめる"><span class="playIcon" aria-hidden="true"></span></button></section>
+<div class="app" id="app">
+<section class="screen title" id="title"><h1 class="logo"><img class="logoImg" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" onload="this.classList.add('ready')" onerror="var t=this.nextElementSibling;this.remove();if(t)t.classList.add('ready')"><span class="logoText"><span>くるま</span><span>どれ</span><span>かな?</span></span></h1><p class="lead" aria-hidden="true"></p><button class="start" id="start" aria-label="はじめる"><span class="playIcon" aria-hidden="true"></span></button></section>
 <section class="screen play hide" id="play"><div class="msg" id="msg" aria-live="polite"></div><div class="sampleLane"><div class="sample" id="sample"></div></div><div class="choiceLane" id="choices"></div></section>
 </div><div class="rotate">📱↻<br>よこむきに してね</div>
 <script>
@@ -96,10 +88,10 @@ const cars=[
 const el={title:document.getElementById('title'),play:document.getElementById('play'),start:document.getElementById('start'),msg:document.getElementById('msg'),sample:document.getElementById('sample'),choices:document.getElementById('choices')};
 let sample=null,last=null,lock=false;
 function fallback(c){return `<svg class="fallbackSvg" viewBox="0 0 320 230" aria-hidden="true"><rect width="320" height="230" fill="none"/><rect x="45" y="70" width="230" height="105" rx="42" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="105" y="35" width="145" height="80" rx="24" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="120" y="52" width="55" height="42" rx="10" fill="#9fe7ff"/><rect x="185" y="52" width="50" height="42" rx="10" fill="#9fe7ff"/><circle cx="138" cy="73" r="15" fill="#fff"/><circle cx="198" cy="73" r="15" fill="#fff"/><circle cx="142" cy="78" r="8" fill="#111"/><circle cx="202" cy="78" r="8" fill="#111"/><circle cx="95" cy="178" r="31" fill="#222"/><circle cx="235" cy="178" r="31" fill="#222"/><circle cx="95" cy="178" r="14" fill="#eee"/><circle cx="235" cy="178" r="14" fill="#eee"/></svg>`}
-function car(c){return `<span class="car"><img class="assetImg" src="${c.src}" alt="" draggable="false" onload="this.classList.add('ready');this.nextElementSibling.classList.add('off')" onerror="this.remove()">${fallback(c)}</span>`}
+function car(c){return `<span class="car"><img class="assetImg" src="${c.src}" alt="" draggable="false" onload="this.classList.add('ready')" onerror="var f=this.nextElementSibling;this.remove();if(f)f.classList.add('ready')">${fallback(c)}</span>`}
 function rnd(n){return Math.floor(Math.random()*n)}function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
-function q(){lock=true;el.choices.innerHTML='';let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=car(sample);el.sample.firstChild.classList.add('sampleIn');el.msg.textContent='';setTimeout(show,1350)}
-function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id)).slice(0,2);shuffle([sample,...others]).forEach((c,i)=>{let b=document.createElement('button');b.className='choice enter';b.type='button';b.style.setProperty('--i',i);b.innerHTML=car(c);b.onclick=()=>tap(b,c);el.choices.appendChild(b)});setTimeout(()=>lock=false,1700)}
+function q(){lock=true;el.choices.innerHTML='';let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=car(sample);el.sample.firstChild.classList.add('sampleIn');el.msg.textContent='';setTimeout(show,2600)}
+function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id)).slice(0,2);shuffle([sample,...others]).forEach((c,i)=>{let b=document.createElement('button');b.className='choice enter';b.type='button';b.style.setProperty('--i',i);b.innerHTML=car(c);b.onclick=()=>tap(b,c);el.choices.appendChild(b)});setTimeout(()=>lock=false,3400)}
 function tap(b,c){if(lock)return;if(c.id===sample.id)ok(b);else ng(b)}
 function ng(b){lock=true;b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle');el.msg.textContent=Math.random()<.5?'あれれ？':'もういちど！';setTimeout(()=>lock=false,650)}
 function ok(b){lock=true;b.classList.add('jump');[...el.choices.children].forEach(x=>{if(x!==b)x.classList.add('fade')});el.msg.textContent='やったー！';spark(b);setTimeout(q,1700)}
