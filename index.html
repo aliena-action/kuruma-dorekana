@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>くるまどれかな？</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game" class="game" data-state="title">
+    <section id="screen-title" class="screen screen-title">
+      <img class="title-logo" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？">
+      <p class="title-lead">くるまを えらんで あそぼう！</p>
+      <button id="btn-start" class="btn-start" type="button">スタート</button>
+      <div class="title-cars" aria-hidden="true">
+        <img src="assets/car_red_full.png" alt="">
+        <img src="assets/car_blue_full.png" alt="">
+        <img src="assets/car_yellow_full.png" alt="">
+        <img src="assets/car_green_full.png" alt="">
+      </div>
+    </section>
+    <section id="screen-play" class="screen screen-play" hidden>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+      <div class="lane lane-sample">
+        <div class="sample-slot">
+          <img id="sample-car" class="car car-sample" src="" alt="みほんのくるま">
+        </div>
+      </div>
+      <div class="lane lane-choices" id="lane-choices"></div>
+      <div id="sparkle-layer" class="sparkle-layer" aria-hidden="true"></div>
+    </section>
+  </div>
+  <div class="rotate-hint" aria-hidden="true">
+    <div class="rotate-hint-inner">
+      <span class="rotate-icon">📱↻</span>
+      <p>よこむきに してね</p>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
