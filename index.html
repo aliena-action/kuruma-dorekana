@@ -25,8 +25,10 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .hide{display:none!important}
 .title{justify-content:center;gap:clamp(10px,2.6svh,22px);padding:max(8px,calc(env(safe-area-inset-top) + 1svh)) max(18px,calc(env(safe-area-inset-right) + 5vw)) max(8px,calc(env(safe-area-inset-bottom) + 1svh)) max(18px,calc(env(safe-area-inset-left) + 5vw));background:rgba(255,255,255,.18)}
 .logo{display:grid;place-items:center;line-height:.95;text-align:center}
-.logoImg{display:block;width:min(72vw,520px);max-height:34svh;object-fit:contain;filter:drop-shadow(0 9px 8px rgba(0,0,0,.18))}
+.logoImg{display:none;width:min(72vw,520px);max-height:34svh;object-fit:contain;filter:drop-shadow(0 9px 8px rgba(0,0,0,.18))}
+.logoImg.ready{display:block}
 .logoText{font-weight:900;font-size:clamp(34px,8.5vw,76px);letter-spacing:0;text-shadow:0 4px 0 #fff,4px 0 0 #fff,-4px 0 0 #fff,0 -4px 0 #fff,0 9px 10px rgba(0,0,0,.16)}
+.logoText.off{display:none}
 .logoText span:nth-child(1){color:#ef3f26}
 .logoText span:nth-child(2){color:#1d78d6}
 .logoText span:nth-child(3){color:#43ad36}
@@ -44,12 +46,15 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .sampleLane{height:100%}
 .choiceLane{height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,2vw,26px);align-items:end;justify-items:center;padding-bottom:max(2px,.6svh)}
 .car{display:block;width:clamp(104px,24vw,230px);height:auto;aspect-ratio:320/230;filter:drop-shadow(0 8px 4px rgba(0,0,0,.16));pointer-events:none}
-.car img,.car svg{display:block;width:100%;height:100%;object-fit:contain}
+.assetImg{display:none!important;width:100%;height:100%;object-fit:contain}
+.assetImg.ready{display:block!important}
+.fallbackSvg{display:block;width:100%;height:100%}
+.fallbackSvg.off{display:none!important}
 .sample .car{width:clamp(104px,24vw,230px)}
 .choice{width:min(100%,clamp(126px,26vw,260px));height:100%;max-height:190px;min-height:96px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;border-radius:24px;padding:clamp(6px,1.4svh,14px) clamp(8px,1.6vw,18px);cursor:pointer}
 .choice .car{width:clamp(100px,21vw,220px);max-height:100%}
-.enter{animation:choiceDrive .7s cubic-bezier(.16,1.2,.3,1) both;animation-delay:calc(var(--i,0)*.14s)}
-.sampleIn{animation:sampleDrive .72s cubic-bezier(.14,1.05,.32,1) both}
+.enter{animation:choiceDrive 1.2s cubic-bezier(.18,.9,.26,1) both;animation-delay:calc(var(--i,0)*.22s)}
+.sampleIn{animation:sampleDrive 1.45s cubic-bezier(.18,.92,.28,1) both}
 .wiggle{animation:becon .5s ease}
 .jump{animation:jump .72s cubic-bezier(.2,1.4,.35,1)}
 .fade{opacity:.25;transform:scale(.88);transition:.3s}
@@ -69,8 +74,8 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
   .choice .car{width:clamp(96px,20vw,200px)}
 }
 @media(orientation:portrait){.rotate{display:flex}.app{filter:blur(3px)}}
-@keyframes choiceDrive{0%{opacity:0;transform:translateX(42vw) translateY(0) scale(.98)}62%{opacity:1;transform:translateX(-8px) translateY(-5px) scale(1.03)}78%{transform:translateX(5px) translateY(3px) scale(.99)}100%{opacity:1;transform:translateX(0) translateY(0) scale(1)}}
-@keyframes sampleDrive{0%{opacity:0;transform:translateX(-58vw) translateY(0) scale(.98)}72%{opacity:1;transform:translateX(10px) translateY(-4px) scale(1.03)}100%{opacity:1;transform:translateX(0) translateY(0) scale(1)}}
+@keyframes choiceDrive{0%{opacity:0;transform:translateX(34vw) translateY(0) scale(.99)}46%{opacity:1;transform:translateX(10px) translateY(-3px) scale(1.02)}66%{transform:translateX(-5px) translateY(3px) scale(.995)}84%{transform:translateX(2px) translateY(-1px) scale(1.005)}100%{opacity:1;transform:translateX(0) translateY(0) scale(1)}}
+@keyframes sampleDrive{0%{opacity:0;transform:translateX(-42vw) translateY(0) scale(.99)}48%{opacity:1;transform:translateX(12px) translateY(-3px) scale(1.02)}70%{transform:translateX(-5px) translateY(3px) scale(.995)}100%{opacity:1;transform:translateX(0) translateY(0) scale(1)}}
 @keyframes becon{0%,100%{transform:translateX(0) scale(1)}28%{transform:translateX(-5px) scale(1.06,.9)}52%{transform:translateX(4px) scale(.96,1.05)}76%{transform:translateX(-2px) scale(1.02,.98)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-34px) scale(1.08)}60%{transform:translateY(4px) scale(.98)}}
 @keyframes spark{from{opacity:1;transform:translate(0,0) scale(.7)}to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.25)}}
@@ -78,7 +83,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 </head>
 <body>
 <div class="app" id="app"><div class="cloud c1"></div><div class="cloud c2"></div>
-<section class="screen title" id="title"><h1 class="logo"><img class="logoImg" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="logoText" hidden><span>くるま</span><span>どれ</span><span>かな?</span></span></h1><p class="lead" aria-hidden="true"></p><button class="start" id="start" aria-label="はじめる"><span class="playIcon" aria-hidden="true"></span></button></section>
+<section class="screen title" id="title"><h1 class="logo"><img class="logoImg" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" onload="this.classList.add('ready');this.nextElementSibling.classList.add('off')" onerror="this.remove()"><span class="logoText"><span>くるま</span><span>どれ</span><span>かな?</span></span></h1><p class="lead" aria-hidden="true"></p><button class="start" id="start" aria-label="はじめる"><span class="playIcon" aria-hidden="true"></span></button></section>
 <section class="screen play hide" id="play"><div class="msg" id="msg" aria-live="polite"></div><div class="sampleLane"><div class="sample" id="sample"></div></div><div class="choiceLane" id="choices"></div></section>
 </div><div class="rotate">📱↻<br>よこむきに してね</div>
 <script>
@@ -90,11 +95,11 @@ const cars=[
 ];
 const el={title:document.getElementById('title'),play:document.getElementById('play'),start:document.getElementById('start'),msg:document.getElementById('msg'),sample:document.getElementById('sample'),choices:document.getElementById('choices')};
 let sample=null,last=null,lock=false;
-function fallback(c){return `<svg viewBox="0 0 320 230" aria-hidden="true" hidden><rect width="320" height="230" fill="none"/><rect x="45" y="70" width="230" height="105" rx="42" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="105" y="35" width="145" height="80" rx="24" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="120" y="52" width="55" height="42" rx="10" fill="#9fe7ff"/><rect x="185" y="52" width="50" height="42" rx="10" fill="#9fe7ff"/><circle cx="138" cy="73" r="15" fill="#fff"/><circle cx="198" cy="73" r="15" fill="#fff"/><circle cx="142" cy="78" r="8" fill="#111"/><circle cx="202" cy="78" r="8" fill="#111"/><circle cx="95" cy="178" r="31" fill="#222"/><circle cx="235" cy="178" r="31" fill="#222"/><circle cx="95" cy="178" r="14" fill="#eee"/><circle cx="235" cy="178" r="14" fill="#eee"/></svg>`}
-function car(c){return `<span class="car"><img src="${c.src}" alt="" draggable="false" onerror="this.hidden=true;this.nextElementSibling.hidden=false">${fallback(c)}</span>`}
+function fallback(c){return `<svg class="fallbackSvg" viewBox="0 0 320 230" aria-hidden="true"><rect width="320" height="230" fill="none"/><rect x="45" y="70" width="230" height="105" rx="42" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="105" y="35" width="145" height="80" rx="24" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="120" y="52" width="55" height="42" rx="10" fill="#9fe7ff"/><rect x="185" y="52" width="50" height="42" rx="10" fill="#9fe7ff"/><circle cx="138" cy="73" r="15" fill="#fff"/><circle cx="198" cy="73" r="15" fill="#fff"/><circle cx="142" cy="78" r="8" fill="#111"/><circle cx="202" cy="78" r="8" fill="#111"/><circle cx="95" cy="178" r="31" fill="#222"/><circle cx="235" cy="178" r="31" fill="#222"/><circle cx="95" cy="178" r="14" fill="#eee"/><circle cx="235" cy="178" r="14" fill="#eee"/></svg>`}
+function car(c){return `<span class="car"><img class="assetImg" src="${c.src}" alt="" draggable="false" onload="this.classList.add('ready');this.nextElementSibling.classList.add('off')" onerror="this.remove()">${fallback(c)}</span>`}
 function rnd(n){return Math.floor(Math.random()*n)}function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
-function q(){lock=true;el.choices.innerHTML='';let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=car(sample);el.sample.firstChild.classList.add('sampleIn');el.msg.textContent='';setTimeout(show,920)}
-function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id)).slice(0,2);shuffle([sample,...others]).forEach((c,i)=>{let b=document.createElement('button');b.className='choice enter';b.type='button';b.style.setProperty('--i',i);b.innerHTML=car(c);b.onclick=()=>tap(b,c);el.choices.appendChild(b)});setTimeout(()=>lock=false,980)}
+function q(){lock=true;el.choices.innerHTML='';let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=car(sample);el.sample.firstChild.classList.add('sampleIn');el.msg.textContent='';setTimeout(show,1350)}
+function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id)).slice(0,2);shuffle([sample,...others]).forEach((c,i)=>{let b=document.createElement('button');b.className='choice enter';b.type='button';b.style.setProperty('--i',i);b.innerHTML=car(c);b.onclick=()=>tap(b,c);el.choices.appendChild(b)});setTimeout(()=>lock=false,1700)}
 function tap(b,c){if(lock)return;if(c.id===sample.id)ok(b);else ng(b)}
 function ng(b){lock=true;b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle');el.msg.textContent=Math.random()<.5?'あれれ？':'もういちど！';setTimeout(()=>lock=false,650)}
 function ok(b){lock=true;b.classList.add('jump');[...el.choices.children].forEach(x=>{if(x!==b)x.classList.add('fade')});el.msg.textContent='やったー！';spark(b);setTimeout(q,1700)}
