@@ -57,6 +57,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .carPose{display:block;position:relative;width:100%;height:100%;animation:idlePose 2.6s ease-in-out infinite;animation-delay:var(--idle-delay,0s);transform-origin:50% 82%}
 .carPose.correctPose{animation:correctPose .7s ease-out both}
 .carPose.wrongPose{animation:wrongPose .36s ease-out both}
+.carPose.funPose{animation:funPose .62s ease-out both}
 .carLayerCanvas{position:absolute;inset:0;opacity:0;transition:opacity .12s ease}
 .carAnimated.layeredReady .carLayerCanvas{opacity:1}
 .carLayer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
@@ -91,6 +92,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 @keyframes idlePose{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.006)}}
 @keyframes correctPose{0%{transform:translateY(0) scale(1)}18%{transform:translateY(2px) scale(1.02,.96)}52%{transform:translateY(-10px) scale(.99,1.04)}76%{transform:translateY(-2px) scale(1.01,.99)}100%{transform:translateY(0) scale(1)}}
 @keyframes wrongPose{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(4px) scale(1.04,.9)}70%{transform:translateY(1px) scale(.98,1.03)}}
+@keyframes funPose{0%,100%{transform:translateY(0) scale(1) rotate(0)}18%{transform:translateY(2px) scale(1.02,.97) rotate(-1.4deg)}48%{transform:translateY(-5px) scale(.99,1.03) rotate(1.2deg)}72%{transform:translateY(1px) scale(1.01,.98) rotate(-.8deg)}}
 @keyframes effectPop{0%{opacity:0;transform:scale(.8)}22%{opacity:.9;transform:scale(1.04)}100%{opacity:0;transform:scale(1.18)}}
 @keyframes becon{0%,100%{transform:translateX(0) scale(1)}28%{transform:translateX(-5px) scale(1.06,.9)}52%{transform:translateX(4px) scale(.96,1.05)}76%{transform:translateX(-2px) scale(1.02,.98)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-34px) scale(1.08)}60%{transform:translateY(4px) scale(.98)}}
@@ -109,15 +111,24 @@ const cars=[
   {id:'yellow',src:'assets/car_yellow_full.png',color:'#f5bd16'},
   {id:'green',src:'assets/car_green_full.png',color:'#45aa35'}
 ];
-const animatedColors=['blue','green','red','yellow'];
-const animatedEffects={correct:'assets/animation/Effect/Eff_correct.png',wrong:'assets/animation/Effect/Eff_wrong.png'};
+const guestCar={id:'dump',color:'#7d756b',guest:true};
+const animatedBaseColors=['blue','green','red','yellow'];
+const animatedColors=[...animatedBaseColors,guestCar.id];
+const animatedEffects={correct:'assets/animation/Effect/Eff_correct.png',wrong:'assets/animation/Effect/Eff_wrong.png',fun:'assets/animation/Effect/Eff_fun.png'};
 const animatedCarAssets=Object.fromEntries(animatedColors.map(id=>{
   const base=`assets/animation/cars/car_${id}/car_${id}_`;
-  return [id,{
+  let assets={
     body:{normal:base+'body_normal.png',correct01:base+'body_correct_01.png',correct02:base+'body_correct_02.png',correct03:base+'body_correct_03.png',wrong01:base+'body_wrong_01.png',wrong02:base+'body_wrong_02.png'},
     eye:{normal:base+'eye_normal.png',blink:base+'eye_blink.png',correct01:base+'eye_correct_01.png',correct02:base+'eye_correct_02.png',correct03:base+'eye_correct_03.png',wrong01:base+'eye_wrong_01.png',wrong02:base+'eye_wrong_02.png'},
     tire:{normal:base+'tire_normal.png',up:base+'tire_up.png',down:base+'tire_down.png'}
-  }];
+  };
+  if(id===guestCar.id){
+    assets.body.fun01=base+'body_fun_01.png';
+    assets.body.fun02=base+'body_fun_02.png';
+    assets.eye.fun01=base+'eye_fun_01.png';
+    assets.eye.fun02=base+'eye_fun_02.png';
+  }
+  return [id,assets];
 }));
 const framePlan={
   normal:{body:'normal',eye:'normal',tire:'normal'},
@@ -126,24 +137,29 @@ const framePlan={
   correct02:{body:'correct02',eye:'correct02',tire:'down'},
   correct03:{body:'correct03',eye:'correct03',tire:'normal'},
   wrong01:{body:'wrong01',eye:'wrong01',tire:'down'},
-  wrong02:{body:'wrong02',eye:'wrong02',tire:'up'}
+  wrong02:{body:'wrong02',eye:'wrong02',tire:'up'},
+  fun01:{body:'fun01',eye:'fun01',tire:'down'},
+  fun02:{body:'fun02',eye:'fun02',tire:'up'}
 };
 const el={title:document.getElementById('title'),play:document.getElementById('play'),start:document.getElementById('start'),msg:document.getElementById('msg'),sample:document.getElementById('sample'),choices:document.getElementById('choices')};
-let sample=null,last=null,lock=false,showTimer=null,sampleController=null,activeControllers=[],choiceControllers=new WeakMap();
+let sample=null,last=null,lock=false,showTimer=null,sampleController=null,activeControllers=[],choiceControllers=new WeakMap(),guestThisQuestion=false,guestAssetsReady=false,guestAssetsFailed=false,questionsUntilGuest=nextGuestInterval();
 const preloadCache=new Map(),carPreloadCache=new Map();
 function fallback(c){return `<svg class="fallbackSvg" viewBox="0 0 320 230" aria-hidden="true"><rect width="320" height="230" fill="none"/><rect x="45" y="70" width="230" height="105" rx="42" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="105" y="35" width="145" height="80" rx="24" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="120" y="52" width="55" height="42" rx="10" fill="#9fe7ff"/><rect x="185" y="52" width="50" height="42" rx="10" fill="#9fe7ff"/><circle cx="138" cy="73" r="15" fill="#fff"/><circle cx="198" cy="73" r="15" fill="#fff"/><circle cx="142" cy="78" r="8" fill="#111"/><circle cx="202" cy="78" r="8" fill="#111"/><circle cx="95" cy="178" r="31" fill="#222"/><circle cx="235" cy="178" r="31" fill="#222"/><circle cx="95" cy="178" r="14" fill="#eee"/><circle cx="235" cy="178" r="14" fill="#eee"/></svg>`}
 function car(c,src=c.src){return `<span class="car"><img class="assetImg" src="${src}" alt="" draggable="false" onload="this.classList.add('ready')" onerror="var f=this.nextElementSibling;this.remove();if(f)f.classList.add('ready')">${fallback(c)}</span>`}
 function layerImg(cls,src){return `<img class="carLayer ${cls}" src="${src}" alt="" draggable="false" onerror="var r=this.closest('.carAnimated');if(r)r.classList.add('layerFallback')">`}
-function layeredCar(c,i=0,{extraClass='',effect=true}={}){let a=animatedCarAssets[c.id];if(!a)return car(c);let e=effect?`<img class="carLayer effectLayer" alt="" draggable="false" onerror="this.classList.remove('on')">`:'';return `<span class="car carAnimated ${extraClass}" data-car-id="${c.id}" style="--idle-delay:${(-i*.42).toFixed(2)}s"><span class="carPose"><span class="carLayerCanvas">${layerImg('bodyLayer',a.body.normal)}${layerImg('tireLayer',a.tire.normal)}${layerImg('eyeLayer',a.eye.normal)}${e}</span><img class="assetImg fallbackFull" src="${c.src}" alt="" draggable="false" onload="this.classList.add('ready')" onerror="this.remove()"></span></span>`}
+function layeredCar(c,i=0,{extraClass='',effect=true}={}){let a=animatedCarAssets[c.id];if(!a)return car(c);let e=effect?`<img class="carLayer effectLayer" alt="" draggable="false" onerror="this.classList.remove('on')">`:'';let fb=c.src?`<img class="assetImg fallbackFull" src="${c.src}" alt="" draggable="false" onload="this.classList.add('ready')" onerror="this.remove()">`:'';return `<span class="car carAnimated ${extraClass}" data-car-id="${c.id}" style="--idle-delay:${(-i*.42).toFixed(2)}s"><span class="carPose"><span class="carLayerCanvas">${layerImg('bodyLayer',a.body.normal)}${layerImg('tireLayer',a.tire.normal)}${layerImg('eyeLayer',a.eye.normal)}${e}</span>${fb}</span></span>`}
 function animatedCar(c,i){return layeredCar(c,i)}
 function sampleCar(c){return `<span class="sampleDriveWrap"><span class="sampleMirror">${layeredCar(c,0,{extraClass:'sampleCar',effect:false})}</span></span>`}
 function rnd(n){return Math.floor(Math.random()*n)}function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
-function carAssetUrls(id){let a=animatedCarAssets[id];return [...Object.values(a.body),...Object.values(a.eye),...Object.values(a.tire)]}
+function carAssetUrls(id){let a=animatedCarAssets[id];return a?[...Object.values(a.body),...Object.values(a.eye),...Object.values(a.tire)]:[]}
 function preloadImage(src){if(!src)return Promise.resolve(false);if(!preloadCache.has(src)){preloadCache.set(src,new Promise(resolve=>{let img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);img.src=src}))}return preloadCache.get(src)}
 function preloadCarAssets(id){if(!carPreloadCache.has(id)){carPreloadCache.set(id,Promise.all(carAssetUrls(id).map(preloadImage)).then(r=>r.every(Boolean)))}return carPreloadCache.get(id)}
-function preloadAnimatedAssets(){animatedColors.forEach(preloadCarAssets);Object.values(animatedEffects).forEach(preloadImage)}
+function preloadGuestAssets(){return Promise.all([preloadCarAssets(guestCar.id),preloadImage(animatedEffects.fun)]).then(r=>{guestAssetsReady=r.every(Boolean);guestAssetsFailed=!guestAssetsReady;return guestAssetsReady})}
+function preloadAnimatedAssets(){animatedBaseColors.forEach(preloadCarAssets);preloadImage(animatedEffects.correct);preloadImage(animatedEffects.wrong);preloadGuestAssets()}
+function nextGuestInterval(){return 18+rnd(15)}
+function shouldShowGuest(){if(!guestAssetsReady)return false;questionsUntilGuest--;if(questionsUntilGuest>0)return false;questionsUntilGuest=nextGuestInterval();return true}
 class LayeredCarController{
-  constructor(button,c,index,{blink=true}={}){this.button=button;this.car=c;this.color=c.id;this.assets=animatedCarAssets[c.id];this.root=button.querySelector('.carAnimated');this.pose=button.querySelector('.carPose');this.img={tire:button.querySelector('.tireLayer'),body:button.querySelector('.bodyLayer'),eye:button.querySelector('.eyeLayer'),effect:button.querySelector('.effectLayer')};this.timers=[];this.blinkTimer=null;this.state='idle';this.disposed=false;this.fallback=!this.assets;this.wrongBusy=false;this.index=index;this.blink=blink}
+  constructor(button,c,index,{blink=true}={}){this.button=button;this.car=c;this.color=c.id;this.assets=animatedCarAssets[c.id];this.root=button.querySelector('.carAnimated');this.pose=button.querySelector('.carPose');this.img={tire:button.querySelector('.tireLayer'),body:button.querySelector('.bodyLayer'),eye:button.querySelector('.eyeLayer'),effect:button.querySelector('.effectLayer')};this.timers=[];this.blinkTimer=null;this.state='idle';this.disposed=false;this.fallback=!this.assets;this.wrongBusy=false;this.funBusy=false;this.index=index;this.blink=blink}
   init(){if(this.fallback){this.useFallback();return}this.setFrame('normal');preloadCarAssets(this.color).then(ok=>{if(this.disposed)return;if(ok){this.root.classList.add('layeredReady');this.root.classList.remove('layerFallback');this.setFrame('normal');if(this.blink)this.scheduleBlink()}else this.useFallback()})}
   useFallback(){this.fallback=true;if(this.root){this.root.classList.add('layerFallback');this.root.classList.remove('layeredReady')}}
   clearTimers(){this.timers.forEach(clearTimeout);this.timers=[];if(this.blinkTimer){clearTimeout(this.blinkTimer);this.blinkTimer=null}}
@@ -152,16 +168,18 @@ class LayeredCarController{
   scheduleBlink(){if(this.disposed||this.fallback||this.state!=='idle')return;this.blinkTimer=setTimeout(()=>{if(this.disposed||this.state!=='idle')return;this.state='blink';this.setFrame('blink');this.timers.push(setTimeout(()=>{if(this.disposed)return;this.setFrame('normal');this.state='idle';this.scheduleBlink()},120))},3500+Math.random()*3500)}
   showEffect(kind){if(this.fallback||!this.img.effect)return;this.img.effect.src=animatedEffects[kind]||'';this.img.effect.classList.remove('on');void this.img.effect.offsetWidth;this.img.effect.classList.add('on')}
   hideEffect(){if(this.img.effect)this.img.effect.classList.remove('on')}
-  runSequence(kind,steps,poseClass,doneMs){this.clearTimers();this.state=kind;this.pose.classList.remove('correctPose','wrongPose');void this.pose.offsetWidth;this.pose.classList.add(poseClass);this.showEffect(kind);let elapsed=0;this.setFrame(steps[0][0]);for(let i=1;i<steps.length;i++){elapsed+=steps[i-1][1];this.timers.push(setTimeout(()=>this.setFrame(steps[i][0]),elapsed))}let frameMs=steps.reduce((sum,s)=>sum+s[1],0);this.timers.push(setTimeout(()=>this.setFrame('normal'),frameMs));this.timers.push(setTimeout(()=>{this.pose.classList.remove(poseClass);this.hideEffect();this.state='idle';this.wrongBusy=false;if(this.blink)this.scheduleBlink()},doneMs))}
+  runSequence(kind,steps,poseClass,doneMs){this.clearTimers();this.state=kind;this.pose.classList.remove('correctPose','wrongPose','funPose');void this.pose.offsetWidth;this.pose.classList.add(poseClass);this.showEffect(kind);let elapsed=0;this.setFrame(steps[0][0]);for(let i=1;i<steps.length;i++){elapsed+=steps[i-1][1];this.timers.push(setTimeout(()=>this.setFrame(steps[i][0]),elapsed))}let frameMs=steps.reduce((sum,s)=>sum+s[1],0);this.timers.push(setTimeout(()=>this.setFrame('normal'),frameMs));this.timers.push(setTimeout(()=>{this.pose.classList.remove(poseClass);this.hideEffect();this.state='idle';this.wrongBusy=false;this.funBusy=false;if(this.blink)this.scheduleBlink()},doneMs))}
   playCorrect(){this.wrongBusy=false;this.runSequence('correct',[['correct01',120],['correct02',220],['correct03',180]],'correctPose',700)}
   playWrong(){if(this.wrongBusy)return false;this.wrongBusy=true;this.runSequence('wrong',[['wrong01',90],['wrong02',140],['wrong01',90]],'wrongPose',360);return true}
+  playFun(){if(this.funBusy||this.fallback||!this.assets.body.fun01||!this.assets.eye.fun01)return false;this.funBusy=true;this.runSequence('fun',[['fun01',100],['fun01',100],['fun02',200],['fun01',100],['fun01',100]],'funPose',640);return true}
 }
 function cleanupControllers(){if(sampleController){sampleController.cleanup();sampleController=null}activeControllers.forEach(c=>c.cleanup());activeControllers=[];choiceControllers=new WeakMap()}
 function resetChoiceEntry(){el.choices.getAnimations().forEach(a=>a.cancel());el.choices.classList.remove('groupIn');el.choices.style.animation='';el.choices.style.transform='';el.choices.onanimationend=null}
 function stopChoiceEntry(){if(!el.choices.classList.contains('groupIn'))return;let entry=el.choices.getAnimations().find(a=>a.animationName==='choiceGroupDrive');if(entry)entry.pause();let t=getComputedStyle(el.choices).transform;el.choices.getAnimations().forEach(a=>{if(a.animationName==='choiceGroupDrive')a.cancel()});el.choices.style.animation='none';el.choices.style.transform=t==='none'?'translateX(0)':t;el.choices.classList.remove('groupIn');el.choices.onanimationend=null}
-function q(){lock=false;if(showTimer)clearTimeout(showTimer);cleanupControllers();resetChoiceEntry();el.choices.innerHTML='';let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=sampleCar(sample);let s=el.sample.firstChild;sampleController=new LayeredCarController(s,sample,0,{blink:false});sampleController.init();s.classList.add('sampleIn');s.onanimationend=()=>s.classList.remove('sampleIn');el.msg.textContent='';showTimer=setTimeout(show,3200)}
-function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id)).slice(0,2);shuffle([sample,...others]).forEach((c,i)=>{let b=document.createElement('button');b.className='choice';b.type='button';b.innerHTML=animatedCar(c,i);let ctrl=new LayeredCarController(b,c,i);choiceControllers.set(b,ctrl);activeControllers.push(ctrl);ctrl.init();b.onclick=()=>tap(b,c);el.choices.appendChild(b)});void el.choices.offsetWidth;el.choices.classList.add('groupIn');el.choices.onanimationend=e=>{if(e.animationName==='choiceGroupDrive')resetChoiceEntry()};lock=false}
-function tap(b,c){if(lock)return;if(c.id===sample.id)ok(b);else ng(b)}
+function q(){lock=false;if(showTimer)clearTimeout(showTimer);cleanupControllers();resetChoiceEntry();el.choices.innerHTML='';guestThisQuestion=shouldShowGuest();let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=sampleCar(sample);let s=el.sample.firstChild;sampleController=new LayeredCarController(s,sample,0,{blink:false});sampleController.init();s.classList.add('sampleIn');s.onanimationend=()=>s.classList.remove('sampleIn');el.msg.textContent='';showTimer=setTimeout(show,3200)}
+function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id));let choices=guestThisQuestion&&guestAssetsReady?[sample,others[0],guestCar]:[sample,...others.slice(0,2)];shuffle(choices).forEach((c,i)=>{let b=document.createElement('button');b.className='choice';b.type='button';b.innerHTML=animatedCar(c,i);let ctrl=new LayeredCarController(b,c,i);choiceControllers.set(b,ctrl);activeControllers.push(ctrl);ctrl.init();b.onclick=()=>tap(b,c);el.choices.appendChild(b)});void el.choices.offsetWidth;el.choices.classList.add('groupIn');el.choices.onanimationend=e=>{if(e.animationName==='choiceGroupDrive')resetChoiceEntry()};lock=false}
+function tap(b,c){if(lock)return;if(c.guest)guest(b);else if(c.id===sample.id)ok(b);else ng(b)}
+function guest(b){let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playFun()}
 function ng(b){let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playWrong();else{b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle')}el.msg.textContent=Math.random()<.5?'あれれ？':'もういちど！'}
 function ok(b){lock=true;stopChoiceEntry();let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playCorrect();else b.classList.add('jump');if(sampleController)sampleController.playCorrect();[...el.choices.children].forEach(x=>{if(x!==b)x.classList.add('fade')});el.msg.textContent='やったー！';setTimeout(q,1700)}
 function spark(b){let r=b.getBoundingClientRect();let cx=r.left+r.width/2,cy=r.top+r.height/2;for(let i=0;i<10;i++){let s=document.createElement('span');s.className='spark';s.textContent='✨';s.style.left=cx+'px';s.style.top=cy+'px';let a=Math.PI*2*i/10,d=60+Math.random()*70;s.style.setProperty('--x',Math.cos(a)*d+'px');s.style.setProperty('--y',Math.sin(a)*d-45+'px');document.body.appendChild(s);s.onanimationend=()=>s.remove()}}
