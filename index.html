@@ -49,13 +49,13 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .sample.sampleIdle .carPose:not(.correctPose):not(.wrongPose):not(.funPose){animation:idlePose 2.6s ease-in-out infinite;transform-origin:50% 82%}
 .choice{width:min(100%,clamp(126px,26vw,260px));height:100%;max-height:190px;min-height:96px;display:flex;align-items:end;justify-content:center;border:0;background:transparent;border-radius:24px;padding:clamp(6px,1.4svh,14px) clamp(8px,1.6vw,18px);cursor:pointer}
 .choice .car{width:clamp(100px,21vw,220px);max-height:100%}
-.choiceLane.groupIn{animation:choiceGroupDrive 3.8s ease-in-out both}
-.choiceLane.groupIn .carPose{animation:choiceToddle .95s ease-in-out infinite}
+.choiceLane.groupIn{animation:choiceGroupDrive 3.8s linear both}
 .sampleIn{animation:sampleDrive 3.2s linear both}
 .wiggle{animation:becon .5s ease}
 .jump{animation:jump .72s cubic-bezier(.2,1.4,.35,1)}
 .carAnimated{position:relative;aspect-ratio:1/1;width:clamp(130px,24vw,250px);max-width:100%;max-height:100%}
-.choice .carAnimated[data-car-id="dump"]{transform:scale(1.2);transform-origin:50% 100%}
+.choice .carAnimated[data-car-id="dump"]{transform:scale(1.34);transform-origin:50% 100%}
+.choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit 1s ease-in forwards}
 .carPose{display:block;position:relative;width:100%;height:100%;animation:idlePose 2.6s ease-in-out infinite;animation-delay:var(--idle-delay,0s);transform-origin:50% 82%}
 .carPose.correctPose{animation:correctPose .7s ease-out both}
 .carPose.wrongPose{animation:wrongPose .36s ease-out both}
@@ -70,6 +70,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .carAnimated.layeredReady .fallbackFull{display:none!important}
 .carAnimated.layerFallback .carLayerCanvas{display:none}
 .fade{opacity:.25;transform:scale(.88);transition:.3s}
+.choice.guestGone{pointer-events:none}
 .spark{position:absolute;font-size:clamp(22px,5vw,40px);animation:spark .8s ease-out forwards;pointer-events:none}
 .rotate{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;text-align:center;background:#fffdf6;font-size:7vw;font-weight:900}
 @media(max-height:360px) and (orientation:landscape){
@@ -88,13 +89,13 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
   .choice .carAnimated{width:min(clamp(128px,24vw,210px),calc(58svh - 14px));max-height:calc(42svh - 10px)}
 }
 @media(orientation:portrait){.rotate{display:flex}.app{filter:blur(3px)}}
-@keyframes choiceGroupDrive{0%{opacity:1;transform:translateX(110vw)}18%{transform:translateX(82vw)}38%{transform:translateX(55vw)}60%{transform:translateX(28vw)}82%{transform:translateX(8vw)}100%{opacity:1;transform:translateX(0)}}
-@keyframes choiceToddle{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px)}50%{transform:translateY(2px)}75%{transform:translateY(-2px)}}
+@keyframes choiceGroupDrive{0%{opacity:1;transform:translateX(112vw)}24%{transform:translateX(78vw)}52%{transform:translateX(40vw)}74%{transform:translateX(12vw)}86%{transform:translateX(3.8vw)}93%{transform:translateX(1.1vw)}97%{transform:translateX(.35vw)}100%{opacity:1;transform:translateX(0)}}
 @keyframes sampleDrive{0%{opacity:1;transform:translateX(-112vw) translateY(0)}24%{transform:translateX(-78vw) translateY(-1px)}52%{transform:translateX(-40vw) translateY(1px)}74%{transform:translateX(-12vw) translateY(0)}86%{transform:translateX(-3.8vw) translateY(1px)}93%{transform:translateX(-1.1vw) translateY(0)}97%{transform:translateX(-.35vw) translateY(1px)}100%{opacity:1;transform:translateX(0) translateY(0)}}
 @keyframes idlePose{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.006)}}
 @keyframes correctPose{0%{transform:translateY(0) scale(1)}18%{transform:translateY(2px) scale(1.02,.96)}52%{transform:translateY(-10px) scale(.99,1.04)}76%{transform:translateY(-2px) scale(1.01,.99)}100%{transform:translateY(0) scale(1)}}
 @keyframes wrongPose{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(4px) scale(1.04,.9)}70%{transform:translateY(1px) scale(.98,1.03)}}
 @keyframes funPose{0%,100%{transform:translateY(0) scale(1) rotate(0)}18%{transform:translateY(2px) scale(1.02,.97) rotate(-1.4deg)}48%{transform:translateY(-5px) scale(.99,1.03) rotate(1.2deg)}72%{transform:translateY(1px) scale(1.01,.98) rotate(-.8deg)}}
+@keyframes dumpExit{0%{transform:translateX(0) scale(1.34)}18%{transform:translateX(-18vw) scale(1.34)}100%{transform:translateX(-128vw) scale(1.34)}}
 @keyframes effectPop{0%{opacity:0;transform:scale(.8)}22%{opacity:.9;transform:scale(1.04)}100%{opacity:0;transform:scale(1.18)}}
 @keyframes becon{0%,100%{transform:translateX(0) scale(1)}28%{transform:translateX(-5px) scale(1.06,.9)}52%{transform:translateX(4px) scale(.96,1.05)}76%{transform:translateX(-2px) scale(1.02,.98)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-34px) scale(1.08)}60%{transform:translateY(4px) scale(.98)}}
@@ -176,6 +177,7 @@ class LayeredCarController{
   playCorrect(){this.wrongBusy=false;this.runSequence('correct',[['correct01',120],['correct02',220],['correct03',180]],'correctPose',700)}
   playWrong(){if(this.wrongBusy)return false;this.wrongBusy=true;this.runSequence('wrong',[['wrong01',90],['wrong02',140],['wrong01',90]],'wrongPose',360);return true}
   playFun(){if(this.funBusy||this.fallback||!this.assets.body.fun01||!this.assets.eye.fun01)return false;this.funBusy=true;this.runSequence('fun',[['fun01',100],['fun01',100],['fun02',200],['fun01',100],['fun01',100]],'funPose',640);return true}
+  playFunPair(done){if(this.funBusy||this.fallback||!this.assets.body.fun01||!this.assets.eye.fun01)return false;let count=0,run=()=>{if(this.disposed)return;count++;this.runSequence('fun',[['fun01',100],['fun01',100],['fun02',200],['fun01',100],['fun01',100]],'funPose',640);this.funBusy=true;if(count<2)this.timers.push(setTimeout(run,640));else this.timers.push(setTimeout(()=>{if(!this.disposed&&done)done()},660))};run();return true}
 }
 function cleanupControllers(){if(sampleController){sampleController.cleanup();sampleController=null}activeControllers.forEach(c=>c.cleanup());activeControllers=[];choiceControllers=new WeakMap()}
 function resetChoiceEntry(){el.choices.getAnimations().forEach(a=>a.cancel());el.choices.classList.remove('groupIn');el.choices.style.animation='';el.choices.style.transform='';el.choices.onanimationend=null}
@@ -183,7 +185,8 @@ function stopChoiceEntry(){if(!el.choices.classList.contains('groupIn'))return;l
 function q(){lock=false;if(showTimer)clearTimeout(showTimer);cleanupControllers();resetChoiceEntry();el.choices.innerHTML='';el.sample.classList.remove('sampleIdle');guestThisQuestion=shouldShowGuest();let pool=cars.filter(c=>c.id!==last);sample=pool[rnd(pool.length)]||cars[0];last=sample.id;el.sample.innerHTML=sampleCar(sample);let s=el.sample.firstChild;sampleController=new LayeredCarController(s,sample,0,{blink:false});sampleController.init();s.classList.add('sampleIn');s.onanimationend=e=>{if(e.animationName!=='sampleDrive')return;s.classList.remove('sampleIn');el.sample.classList.add('sampleIdle');if(sampleController)sampleController.enableBlink()};el.msg.textContent='';showTimer=setTimeout(show,CHOICE_START_DELAY_MS)}
 function show(){let others=shuffle(cars.filter(c=>c.id!==sample.id));let choices=guestThisQuestion&&guestAssetsReady?[guestCar,...shuffle([sample,others[0]])]:shuffle([sample,...others.slice(0,2)]);choices.forEach((c,i)=>{let b=document.createElement('button');b.className='choice';b.type='button';b.innerHTML=animatedCar(c,i);let ctrl=new LayeredCarController(b,c,i);choiceControllers.set(b,ctrl);activeControllers.push(ctrl);ctrl.init();b.onclick=()=>tap(b,c);el.choices.appendChild(b)});void el.choices.offsetWidth;el.choices.classList.add('groupIn');el.choices.onanimationend=e=>{if(e.animationName==='choiceGroupDrive')resetChoiceEntry()};lock=false}
 function tap(b,c){if(lock)return;if(c.guest)guest(b);else if(c.id===sample.id)ok(b);else ng(b)}
-function guest(b){let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playFun()}
+function guest(b){if(b.classList.contains('guestActive')||b.classList.contains('guestExiting')||b.classList.contains('guestGone'))return;let ctrl=choiceControllers.get(b);if(ctrl&&ctrl.playFunPair(()=>exitGuest(b,ctrl)))b.classList.add('guestActive')}
+function exitGuest(b,ctrl){if(ctrl.disposed)return;b.classList.remove('guestActive');b.classList.add('guestExiting');let root=b.querySelector('.carAnimated');if(!root)return;root.classList.remove('dumpExit');void root.offsetWidth;root.classList.add('dumpExit');let done=e=>{if(e.animationName!=='dumpExit')return;root.removeEventListener('animationend',done);ctrl.cleanup();choiceControllers.delete(b);b.classList.remove('guestExiting');b.classList.add('guestGone');b.disabled=true;b.innerHTML=''};root.addEventListener('animationend',done)}
 function ng(b){let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playWrong();else{b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle')}el.msg.textContent=Math.random()<.5?'あれれ？':'もういちど！'}
 function ok(b){lock=true;stopChoiceEntry();let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playCorrect();else b.classList.add('jump');if(sampleController)sampleController.playCorrect();[...el.choices.children].forEach(x=>{if(x!==b)x.classList.add('fade')});el.msg.textContent='やったー！';setTimeout(q,1700)}
 function spark(b){let r=b.getBoundingClientRect();let cx=r.left+r.width/2,cy=r.top+r.height/2;for(let i=0;i<10;i++){let s=document.createElement('span');s.className='spark';s.textContent='✨';s.style.left=cx+'px';s.style.top=cy+'px';let a=Math.PI*2*i/10,d=60+Math.random()*70;s.style.setProperty('--x',Math.cos(a)*d+'px');s.style.setProperty('--y',Math.sin(a)*d-45+'px');document.body.appendChild(s);s.onanimationend=()=>s.remove()}}
