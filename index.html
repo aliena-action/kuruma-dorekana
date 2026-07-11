@@ -49,13 +49,13 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .sample.sampleIdle .carPose:not(.correctPose):not(.wrongPose):not(.funPose){animation:idlePose 2.6s ease-in-out infinite;transform-origin:50% 82%}
 .choice{width:min(100%,clamp(126px,26vw,260px));height:100%;max-height:190px;min-height:96px;display:flex;align-items:end;justify-content:center;border:0;background:transparent;border-radius:24px;padding:clamp(6px,1.4svh,14px) clamp(8px,1.6vw,18px);cursor:pointer}
 .choice .car{width:clamp(100px,21vw,220px);max-height:100%}
-.choiceLane.groupIn{animation:choiceGroupDrive 3.8s linear both}
-.sampleIn{animation:sampleDrive 3.2s linear both}
+.choiceLane.groupIn{animation:choiceGroupDrive 3.2s linear both}
+.sampleIn{animation:sampleDrive 2.6s linear both}
 .wiggle{animation:becon .5s ease}
 .jump{animation:jump .72s cubic-bezier(.2,1.4,.35,1)}
 .carAnimated{position:relative;aspect-ratio:1/1;width:clamp(130px,24vw,250px);max-width:100%;max-height:100%}
-.choice .carAnimated[data-car-id="dump"]{transform:scale(1.34);transform-origin:50% 100%}
-.choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit 1s ease-in forwards}
+.choice .carAnimated[data-car-id="dump"]{transform:translateY(-3px) scale(1.34);transform-origin:50% 100%}
+.choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit .85s ease-in forwards}
 .carPose{display:block;position:relative;width:100%;height:100%;animation:idlePose 2.6s ease-in-out infinite;animation-delay:var(--idle-delay,0s);transform-origin:50% 82%}
 .carPose.correctPose{animation:correctPose .7s ease-out both}
 .carPose.wrongPose{animation:wrongPose .36s ease-out both}
@@ -95,7 +95,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 @keyframes correctPose{0%{transform:translateY(0) scale(1)}18%{transform:translateY(2px) scale(1.02,.96)}52%{transform:translateY(-10px) scale(.99,1.04)}76%{transform:translateY(-2px) scale(1.01,.99)}100%{transform:translateY(0) scale(1)}}
 @keyframes wrongPose{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(4px) scale(1.04,.9)}70%{transform:translateY(1px) scale(.98,1.03)}}
 @keyframes funPose{0%,100%{transform:translateY(0) scale(1) rotate(0)}18%{transform:translateY(2px) scale(1.02,.97) rotate(-1.4deg)}48%{transform:translateY(-5px) scale(.99,1.03) rotate(1.2deg)}72%{transform:translateY(1px) scale(1.01,.98) rotate(-.8deg)}}
-@keyframes dumpExit{0%{transform:translateX(0) scale(1.34)}18%{transform:translateX(-18vw) scale(1.34)}100%{transform:translateX(-128vw) scale(1.34)}}
+@keyframes dumpExit{0%{transform:translateX(0) translateY(-3px) scale(1.34)}18%{transform:translateX(-18vw) translateY(-3px) scale(1.34)}100%{transform:translateX(-128vw) translateY(-3px) scale(1.34)}}
 @keyframes effectPop{0%{opacity:0;transform:scale(.8)}22%{opacity:.9;transform:scale(1.04)}100%{opacity:0;transform:scale(1.18)}}
 @keyframes becon{0%,100%{transform:translateX(0) scale(1)}28%{transform:translateX(-5px) scale(1.06,.9)}52%{transform:translateX(4px) scale(.96,1.05)}76%{transform:translateX(-2px) scale(1.02,.98)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-34px) scale(1.08)}60%{transform:translateY(4px) scale(.98)}}
