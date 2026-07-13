@@ -15,22 +15,33 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .app{position:fixed;top:0;left:0;right:0;width:100%;height:var(--app-height);overflow:hidden;background-image:url("assets/bg_road_day.png"),linear-gradient(#75d7ff 0 42%,#8ddd65 42% 48%,#b8b8b8 48% 100%);background-size:100% 100%,100% 100%;background-position:center,center;background-repeat:no-repeat}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;min-height:0}
 .hide{display:none!important}
-.title{justify-content:center;gap:clamp(10px,2.5svh,22px);padding:max(8px,calc(env(safe-area-inset-top) + 1svh)) max(18px,calc(env(safe-area-inset-right) + 5vw)) max(8px,calc(env(safe-area-inset-bottom) + 1svh)) max(18px,calc(env(safe-area-inset-left) + 5vw))}
-.logo{display:grid;place-items:center;line-height:.95;text-align:center}
-.logoImg{display:none;width:min(72vw,520px);max-height:34svh;object-fit:contain;filter:drop-shadow(0 9px 8px rgba(0,0,0,.18))}
-.logoImg.ready{display:block}
-.logoText{display:none;font-weight:900;font-size:clamp(34px,8.5vw,76px);letter-spacing:0;text-shadow:0 4px 0 #fff,4px 0 0 #fff,-4px 0 0 #fff,0 -4px 0 #fff,0 9px 10px rgba(0,0,0,.16)}
-.logoText.ready{display:inline-block}
-.logoText span:nth-child(1){color:#ef3f26}
-.logoText span:nth-child(2){color:#1d78d6}
-.logoText span:nth-child(3){color:#43ad36}
-.lead,.msg{font-weight:900;background:#fffdf6;border:2px solid rgba(74,63,53,.15);border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.12);line-height:1.12;text-align:center}
-.lead{font-size:clamp(16px,3.2vw,26px);padding:.34em 1.1em}
-.lead:empty{display:none}
-.start{position:relative;display:grid;place-items:center;width:clamp(74px,18svh,118px);height:clamp(74px,18svh,118px);font:inherit;color:white;background:#e8452a;border:0;border-radius:50%;box-shadow:0 7px 0 #ad301a,0 10px 18px rgba(0,0,0,.18);cursor:pointer}
-.start:before{content:"";position:absolute;inset:10%;border-radius:50%;background:rgba(255,255,255,.18)}
-.playIcon{position:relative;left:4%;width:0;height:0;border-top:clamp(16px,3.8svh,26px) solid transparent;border-bottom:clamp(16px,3.8svh,26px) solid transparent;border-left:clamp(25px,5.8svh,40px) solid #fff;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15))}
-.start:active{transform:translateY(4px);box-shadow:0 2px 0 #ad301a}
+.title{padding:max(8px,calc(env(safe-area-inset-top) + 1svh)) max(18px,calc(env(safe-area-inset-right) + 5vw)) max(8px,calc(env(safe-area-inset-bottom) + 1svh)) max(18px,calc(env(safe-area-inset-left) + 5vw))}
+.openingStage{--opening-glyph-size:min(30svh,15vw,104px);--opening-glyph-overlap:min(11.25svh,5.625vw,39px);--opening-car-size:min(47svh,34vw,220px);--opening-car-body-offset:min(17.5svh,12.5vw,80px);position:absolute;inset:0;overflow:hidden}
+.openingTitlePosition{position:absolute;z-index:2;top:calc(48svh - var(--opening-glyph-size));left:50%;transform:translateX(-50%);pointer-events:none}
+.openingTitleExit,.openingTitleMerge{display:block}
+.openingGlyphs{display:flex;align-items:flex-start;filter:drop-shadow(0 7px 6px rgba(0,0,0,.15));white-space:nowrap}
+.openingGlyph{visibility:hidden;display:block;flex:0 0 var(--opening-glyph-size);width:var(--opening-glyph-size);height:var(--opening-glyph-size)}
+.openingGlyph+.openingGlyph{margin-left:calc(0px - var(--opening-glyph-overlap))}
+.openingGlyph img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.openingLogoFallback{display:none;width:min(66vw,520px);height:auto;filter:drop-shadow(0 7px 6px rgba(0,0,0,.15))}
+.openingFallback .openingGlyphs{display:none}
+.openingFallback .openingLogoFallback{display:block}
+.openingRunning .openingGlyph{visibility:visible;animation:openingGlyphDrive .84s cubic-bezier(.22,.68,.28,1) both;animation-delay:var(--delay)}
+.openingTitleMerge.isMerging{animation:openingTitleMerge .36s ease-out both;transform-origin:50% 58%}
+.openingCarPosition{position:absolute;z-index:3;top:calc(48svh + 8px - var(--opening-car-body-offset));left:50%;width:var(--opening-car-size);height:var(--opening-car-size);transform:translateX(-50%)}
+.openingCarExit{width:100%;height:100%}
+.openingStartCar{visibility:hidden;position:relative;display:block;width:100%;height:100%;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
+.openingStartCar.carEntering,.openingStartCar.isWaiting,.openingReduced .openingStartCar{visibility:visible}
+.openingStartCar:not(.isWaiting){pointer-events:none}
+.openingStartCar .car{filter:drop-shadow(0 8px 4px rgba(0,0,0,.16))}
+.openingStartCar .carAnimated{width:100%;max-width:none;max-height:none}
+.openingStartCar .carPose{animation:none}
+.openingStartCar.isWaiting .carPose:not(.correctPose){animation:idlePose 2.6s ease-in-out infinite;transform-origin:50% 82%}
+.openingStartCar.carEntering{animation:openingCarDrive .92s cubic-bezier(.2,.7,.24,1) both}
+.openingExiting .openingTitleExit,.openingExiting .openingCarExit{animation:openingExit .5s cubic-bezier(.55,.02,.86,.38) both}
+.openingExiting .openingStartCar{visibility:visible;pointer-events:none}
+.openingPaused *{animation-play-state:paused!important}
+.msg{font-weight:900;background:#fffdf6;border:2px solid rgba(74,63,53,.15);border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.12);line-height:1.12;text-align:center}
 .play{position:absolute;inset:0;padding:max(6px,1.4svh) max(12px,calc(env(safe-area-inset-right) + 2.4vw)) max(8px,calc(env(safe-area-inset-bottom) + 1.2svh)) max(12px,calc(env(safe-area-inset-left) + 2.4vw))}
 .msg{position:absolute;z-index:5;top:max(5px,calc(env(safe-area-inset-top) + 1svh));left:50%;transform:translateX(-50%);max-width:min(92vw,820px);font-size:clamp(14px,2.7vw,24px);padding:.24em .9em}
 .msg:empty{opacity:0;padding:0;border:0;box-shadow:none}
@@ -74,11 +85,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .spark{position:absolute;font-size:clamp(22px,5vw,40px);animation:spark .8s ease-out forwards;pointer-events:none}
 .rotate{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;text-align:center;background:#fffdf6;font-size:7vw;font-weight:900}
 @media(max-height:360px) and (orientation:landscape){
-  .title{gap:clamp(6px,1.5svh,12px)}
-  .logoImg{width:min(66vw,420px);max-height:31svh}
-  .logoText{font-size:clamp(30px,7.6vw,64px)}
-  .lead{font-size:clamp(14px,2.7vw,22px);padding:.3em 1em}
-  .start{width:clamp(64px,17svh,92px);height:clamp(64px,17svh,92px)}
+  .openingLogoFallback{width:min(66vw,420px)}
   .play{padding-top:5px}
   .msg{font-size:clamp(13px,2.5vw,21px);padding:.22em .85em}
   .sampleLane{top:calc(clamp(43px,16svh,58px) + 4px);height:clamp(96px,36svh,130px)}
@@ -89,6 +96,16 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
   .choice .carAnimated{width:min(clamp(128px,24vw,210px),calc(58svh - 14px));max-height:calc(42svh - 10px)}
 }
 @media(orientation:portrait){.rotate{display:flex}.app{filter:blur(3px)}}
+@media(prefers-reduced-motion:reduce){
+  .openingReduced .openingGlyph{visibility:visible;animation:none}
+  .openingReduced .openingStartCar{visibility:visible;animation:none}
+  .openingReduced .openingStartCar .carPose{animation:none}
+  .openingReduced.openingExiting .openingTitleExit,.openingReduced.openingExiting .openingCarExit{animation-duration:.16s}
+}
+@keyframes openingGlyphDrive{0%{transform:translateX(115vw) translateY(0)}72%{transform:translateX(14vw) translateY(-1px)}90%{transform:translateX(-3px) translateY(1px)}100%{transform:translateX(0) translateY(0)}}
+@keyframes openingTitleMerge{0%,100%{transform:scale(1)}40%{transform:scale(1.035,.95)}72%{transform:scale(.99,1.018)}}
+@keyframes openingCarDrive{0%{transform:translateX(115vw) translateY(0)}72%{transform:translateX(8vw) translateY(-1px)}86%{transform:translateX(-12px) translateY(1px)}94%{transform:translateX(3px) translateY(0)}100%{transform:translateX(0) translateY(0)}}
+@keyframes openingExit{0%{transform:translateX(0)}100%{transform:translateX(-130vw)}}
 @keyframes choiceGroupDrive{0%{opacity:1;transform:translateX(112vw)}24%{transform:translateX(78vw)}52%{transform:translateX(40vw)}74%{transform:translateX(12vw)}86%{transform:translateX(3.8vw)}93%{transform:translateX(1.1vw)}97%{transform:translateX(.35vw)}100%{opacity:1;transform:translateX(0)}}
 @keyframes sampleDrive{0%{opacity:1;transform:translateX(-112vw) translateY(0)}24%{transform:translateX(-78vw) translateY(-1px)}52%{transform:translateX(-40vw) translateY(1px)}74%{transform:translateX(-12vw) translateY(0)}86%{transform:translateX(-3.8vw) translateY(1px)}93%{transform:translateX(-1.1vw) translateY(0)}97%{transform:translateX(-.35vw) translateY(1px)}100%{opacity:1;transform:translateX(0) translateY(0)}}
 @keyframes idlePose{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.006)}}
@@ -104,7 +121,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 </head>
 <body>
 <div class="app" id="app">
-<section class="screen title" id="title"><h1 class="logo"><img class="logoImg" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" onload="this.classList.add('ready')" onerror="var t=this.nextElementSibling;this.remove();if(t)t.classList.add('ready')"><span class="logoText"><span>くるま</span><span>どれ</span><span>かな?</span></span></h1><p class="lead" aria-hidden="true"></p><button class="start" id="start" aria-label="はじめる"><span class="playIcon" aria-hidden="true"></span></button></section>
+<section class="screen title" id="title"><div class="openingStage"><div class="openingTitlePosition"><div class="openingTitleExit" id="openingTitleExit"><div class="openingTitleMerge" id="openingTitleMerge"><h1 class="openingGlyphs" id="openingGlyphs" aria-label="くるまどれかな？"><span class="openingGlyph" style="--delay:0ms"><img src="assets/animation/opening/title_01_ku.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:105ms"><img src="assets/animation/opening/title_02_ru.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:210ms"><img src="assets/animation/opening/title_03_ma.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:315ms"><img src="assets/animation/opening/title_04_do.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:420ms"><img src="assets/animation/opening/title_05_re.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:525ms"><img src="assets/animation/opening/title_06_ka.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:630ms"><img src="assets/animation/opening/title_07_na.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:735ms"><img src="assets/animation/opening/title_08_question.png" alt="" draggable="false" onerror="this.style.display='none'"></span></h1><img class="openingLogoFallback" id="openingLogoFallback" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" draggable="false" onerror="this.hidden=true"></div></div></div><div class="openingCarPosition"><div class="openingCarExit" id="openingCarExit"><button class="openingStartCar" id="start" type="button" aria-label="ゲームをはじめる" disabled></button></div></div></div></section>
 <section class="screen play hide" id="play"><div class="msg" id="msg" aria-live="polite"></div><div class="sampleLane"><div class="sample" id="sample"></div></div><div class="choiceLane" id="choices"></div></section>
 </div><div class="rotate">📱↻<br>よこむきに してね</div>
 <script>
@@ -116,6 +133,8 @@ const cars=[
 ];
 const guestCar={id:'dump',color:'#7d756b',guest:true};
 const GUEST_INTERVAL_MIN=8,GUEST_INTERVAL_MAX=14,CHOICE_START_DELAY_MS=2200;
+const openingTitleAssets=['assets/animation/opening/title_01_ku.png','assets/animation/opening/title_02_ru.png','assets/animation/opening/title_03_ma.png','assets/animation/opening/title_04_do.png','assets/animation/opening/title_05_re.png','assets/animation/opening/title_06_ka.png','assets/animation/opening/title_07_na.png','assets/animation/opening/title_08_question.png'];
+const openingLogoFallback='assets/logo_kuruma_dorekana.png',openingYellowFallback='assets/car_yellow_full.png',openingYellowWink='assets/animation/cars/car_yellow/car_yellow_eye_wink.png';
 const animatedBaseColors=['blue','green','red','yellow'];
 const animatedColors=[...animatedBaseColors,guestCar.id];
 const animatedEffects={correct:'assets/animation/Effect/Eff_correct.png',wrong:'assets/animation/Effect/Eff_wrong.png',fun:'assets/animation/Effect/Eff_fun.png'};
@@ -134,6 +153,7 @@ const animatedCarAssets=Object.fromEntries(animatedColors.map(id=>{
   }
   return [id,assets];
 }));
+animatedCarAssets.yellow.eye.wink=openingYellowWink;
 const framePlan={
   normal:{body:'normal',eye:'normal',tire:'normal'},
   blink:{body:'normal',eye:'blink',tire:'normal'},
@@ -145,8 +165,9 @@ const framePlan={
   fun01:{body:'fun01',eye:'fun01',tire:'down'},
   fun02:{body:'fun02',eye:'fun02',tire:'up'}
 };
-const el={title:document.getElementById('title'),play:document.getElementById('play'),start:document.getElementById('start'),msg:document.getElementById('msg'),sample:document.getElementById('sample'),choices:document.getElementById('choices')};
+const el={title:document.getElementById('title'),play:document.getElementById('play'),start:document.getElementById('start'),msg:document.getElementById('msg'),sample:document.getElementById('sample'),choices:document.getElementById('choices'),openingGlyphs:document.getElementById('openingGlyphs'),openingTitleMerge:document.getElementById('openingTitleMerge'),openingTitleExit:document.getElementById('openingTitleExit'),openingCarExit:document.getElementById('openingCarExit')};
 let sample=null,last=null,lock=false,showTimer=null,sampleController=null,activeControllers=[],choiceControllers=new WeakMap(),guestThisQuestion=false,guestAssetsReady=false,guestAssetsFailed=false,questionsUntilGuest=nextGuestInterval();
+let openingController=null,openingAssetsReady=false,openingTitleReady=false,openingYellowReady=false,openingStarted=false,openingReady=false,openingLocked=false,openingFinished=false,openingPhase='loading',openingTimers=[],openingListeners=[];
 const preloadCache=new Map(),carPreloadCache=new Map();
 function fallback(c){return `<svg class="fallbackSvg" viewBox="0 0 320 230" aria-hidden="true"><rect width="320" height="230" fill="none"/><rect x="45" y="70" width="230" height="105" rx="42" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="105" y="35" width="145" height="80" rx="24" fill="${c.color}" stroke="#333" stroke-width="8"/><rect x="120" y="52" width="55" height="42" rx="10" fill="#9fe7ff"/><rect x="185" y="52" width="50" height="42" rx="10" fill="#9fe7ff"/><circle cx="138" cy="73" r="15" fill="#fff"/><circle cx="198" cy="73" r="15" fill="#fff"/><circle cx="142" cy="78" r="8" fill="#111"/><circle cx="202" cy="78" r="8" fill="#111"/><circle cx="95" cy="178" r="31" fill="#222"/><circle cx="235" cy="178" r="31" fill="#222"/><circle cx="95" cy="178" r="14" fill="#eee"/><circle cx="235" cy="178" r="14" fill="#eee"/></svg>`}
 function car(c,src=c.src){return `<span class="car"><img class="assetImg" src="${src}" alt="" draggable="false" onload="this.classList.add('ready')" onerror="var f=this.nextElementSibling;this.remove();if(f)f.classList.add('ready')">${fallback(c)}</span>`}
@@ -159,6 +180,7 @@ function carAssetUrls(id){let a=animatedCarAssets[id];return a?[...Object.values
 function preloadImage(src){if(!src)return Promise.resolve(false);if(!preloadCache.has(src)){preloadCache.set(src,new Promise(resolve=>{let img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);img.src=src}))}return preloadCache.get(src)}
 function preloadCarAssets(id){if(!carPreloadCache.has(id)){carPreloadCache.set(id,Promise.all(carAssetUrls(id).map(preloadImage)).then(r=>r.every(Boolean)))}return carPreloadCache.get(id)}
 function preloadGuestAssets(){return Promise.all([preloadCarAssets(guestCar.id),preloadImage(animatedEffects.fun)]).then(r=>{guestAssetsReady=r.every(Boolean);guestAssetsFailed=!guestAssetsReady;return guestAssetsReady})}
+function preloadOpeningAssets(){return Promise.all([Promise.all(openingTitleAssets.map(preloadImage)),preloadCarAssets('yellow'),preloadImage(openingLogoFallback),preloadImage(openingYellowFallback)]).then(([titleResults,yellowReady])=>{openingTitleReady=titleResults.every(Boolean);openingYellowReady=yellowReady;openingAssetsReady=true;return openingTitleReady&&openingYellowReady})}
 function preloadAnimatedAssets(){animatedBaseColors.forEach(preloadCarAssets);preloadImage(animatedEffects.correct);preloadImage(animatedEffects.wrong);preloadGuestAssets()}
 function nextGuestInterval(){return GUEST_INTERVAL_MIN+rnd(GUEST_INTERVAL_MAX-GUEST_INTERVAL_MIN+1)}
 function shouldShowGuest(){if(!guestAssetsReady)return false;questionsUntilGuest--;if(questionsUntilGuest>0)return false;questionsUntilGuest=nextGuestInterval();return true}
@@ -179,6 +201,23 @@ class LayeredCarController{
   playFun(){if(this.funBusy||this.fallback||!this.assets.body.fun01||!this.assets.eye.fun01)return false;this.funBusy=true;this.runSequence('fun',[['fun01',100],['fun01',100],['fun02',200],['fun01',100],['fun01',100]],'funPose',640);return true}
   playFunPair(done){if(this.funBusy||this.fallback||!this.assets.body.fun01||!this.assets.eye.fun01)return false;let count=0,run=()=>{if(this.disposed)return;count++;this.runSequence('fun',[['fun01',100],['fun01',100],['fun02',200],['fun01',100],['fun01',100]],'funPose',640);this.funBusy=true;if(count<2)this.timers.push(setTimeout(run,640));else this.timers.push(setTimeout(()=>{if(!this.disposed&&done)done()},660))};run();return true}
 }
+function openingIsPortrait(){return matchMedia('(orientation:portrait)').matches}
+function openingReducedMotion(){return matchMedia('(prefers-reduced-motion:reduce)').matches}
+function openingSetTimer(fn,ms){let id=setTimeout(()=>{openingTimers=openingTimers.filter(timer=>timer!==id);fn()},ms);openingTimers.push(id);return id}
+function clearOpeningTimers(){openingTimers.forEach(clearTimeout);openingTimers=[]}
+function clearOpeningListeners(){openingListeners.forEach(([target,handler])=>target.removeEventListener('animationend',handler));openingListeners=[]}
+function onOpeningAnimation(target,name,callback){let handler=e=>{if(e.target!==target||e.animationName!==name)return;target.removeEventListener('animationend',handler);openingListeners=openingListeners.filter(item=>item[1]!==handler);callback()};target.addEventListener('animationend',handler);openingListeners.push([target,handler])}
+function setupOpeningCar(){if(openingController)openingController.cleanup();let yellow=cars.find(c=>c.id==='yellow');el.start.innerHTML=layeredCar(yellow,0,{extraClass:'openingCar',effect:false});openingController=new LayeredCarController(el.start,yellow,0,{blink:false});openingController.init()}
+function resetOpeningSequence(){clearOpeningTimers();clearOpeningListeners();if(openingController){openingController.cleanup();openingController=null}openingStarted=false;openingReady=false;openingLocked=false;openingPhase='waiting';el.start.disabled=true;el.start.innerHTML='';el.start.classList.remove('carEntering','isWaiting');el.openingTitleMerge.classList.remove('isMerging');el.title.classList.remove('openingRunning','openingReduced','openingExiting');el.title.classList.toggle('openingFallback',!openingTitleReady)}
+function startOpening(){if(openingFinished||openingStarted||!openingAssetsReady||openingIsPortrait())return;openingStarted=true;openingPhase='title';openingReady=false;openingLocked=false;el.title.classList.toggle('openingFallback',!openingTitleReady);setupOpeningCar();void el.title.offsetWidth;if(openingReducedMotion()){el.title.classList.add('openingReduced');setOpeningReady();return}if(!openingTitleReady){requestAnimationFrame(startOpeningCar);return}el.title.classList.add('openingRunning');let lastGlyph=el.openingGlyphs.lastElementChild;onOpeningAnimation(lastGlyph,'openingGlyphDrive',startOpeningMerge)}
+function startOpeningMerge(){if(openingPhase!=='title')return;openingPhase='merge';el.openingTitleMerge.classList.add('isMerging');onOpeningAnimation(el.openingTitleMerge,'openingTitleMerge',startOpeningCar)}
+function startOpeningCar(){if(openingIsPortrait()||openingFinished)return;openingPhase='car';el.start.classList.remove('isWaiting');el.start.classList.add('carEntering');void el.start.offsetWidth;onOpeningAnimation(el.start,'openingCarDrive',startOpeningCorrect)}
+function startOpeningCorrect(){if(openingPhase!=='car')return;openingPhase='correct';el.start.classList.remove('carEntering');if(openingYellowReady&&openingController&&!openingController.fallback){openingController.playCorrect();openingSetTimer(setOpeningReady,720)}else openingSetTimer(setOpeningReady,80)}
+function setOpeningReady(){if(openingFinished||openingIsPortrait())return;openingPhase='ready';openingReady=true;el.start.classList.remove('carEntering');el.start.classList.add('isWaiting');el.start.disabled=false;if(!openingReducedMotion())scheduleOpeningWink(520)}
+function scheduleOpeningWink(delay=2500+Math.random()*2000){clearOpeningTimers();if(!openingReady||openingIsPortrait()||openingReducedMotion()||!openingController||openingController.fallback)return;openingSetTimer(()=>{if(!openingReady||openingIsPortrait()||openingController.disposed)return;openingController.state='wink';openingController.img.eye.src=openingYellowWink;openingSetTimer(()=>{if(!openingReady||openingController.disposed)return;openingController.img.eye.src=openingController.assets.eye.normal;openingController.state='idle';scheduleOpeningWink()},220)},delay)}
+function beginOpeningExit(){if(!openingReady||openingLocked||openingFinished)return;openingLocked=true;openingReady=false;openingPhase='exiting';el.start.disabled=true;clearOpeningTimers();clearOpeningListeners();if(openingController){openingController.clearTimers();openingController.setFrame('normal');openingController.state='idle'}el.start.classList.remove('isWaiting','carEntering');el.title.classList.add('openingExiting');let remaining=2,done=()=>{remaining--;if(remaining===0)finishOpening()};onOpeningAnimation(el.openingTitleExit,'openingExit',done);onOpeningAnimation(el.openingCarExit,'openingExit',done)}
+function finishOpening(){if(openingFinished)return;openingFinished=true;openingPhase='done';clearOpeningTimers();clearOpeningListeners();if(openingController){openingController.cleanup();openingController=null}el.title.classList.add('hide');el.play.classList.remove('hide');q()}
+function handleOpeningOrientation(){if(openingFinished)return;let portrait=openingIsPortrait();el.title.classList.toggle('openingPaused',portrait);if(portrait){el.start.disabled=true;if(openingPhase==='ready'){clearOpeningTimers();if(openingController&&openingController.state==='wink'){openingController.setFrame('normal');openingController.state='idle'}}else if(!['loading','waiting','exiting'].includes(openingPhase))resetOpeningSequence();return}if(openingPhase==='ready'){el.start.disabled=false;if(!openingReducedMotion())scheduleOpeningWink(520)}else if(openingAssetsReady&&!openingStarted)startOpening()}
 function cleanupControllers(){if(sampleController){sampleController.cleanup();sampleController=null}activeControllers.forEach(c=>c.cleanup());activeControllers=[];choiceControllers=new WeakMap()}
 function resetChoiceEntry(){el.choices.getAnimations().forEach(a=>a.cancel());el.choices.classList.remove('groupIn');el.choices.style.animation='';el.choices.style.transform='';el.choices.onanimationend=null}
 function stopChoiceEntry(){if(!el.choices.classList.contains('groupIn'))return;let entry=el.choices.getAnimations().find(a=>a.animationName==='choiceGroupDrive');if(entry)entry.pause();let t=getComputedStyle(el.choices).transform;el.choices.getAnimations().forEach(a=>{if(a.animationName==='choiceGroupDrive')a.cancel()});el.choices.style.animation='none';el.choices.style.transform=t==='none'?'translateX(0)':t;el.choices.classList.remove('groupIn');el.choices.onanimationend=null}
@@ -191,6 +230,11 @@ function ng(b){let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playWrong();else{b
 function ok(b){lock=true;stopChoiceEntry();let ctrl=choiceControllers.get(b);if(ctrl)ctrl.playCorrect();else b.classList.add('jump');if(sampleController)sampleController.playCorrect();[...el.choices.children].forEach(x=>{if(x!==b)x.classList.add('fade')});el.msg.textContent='やったー！';setTimeout(q,1700)}
 function spark(b){let r=b.getBoundingClientRect();let cx=r.left+r.width/2,cy=r.top+r.height/2;for(let i=0;i<10;i++){let s=document.createElement('span');s.className='spark';s.textContent='✨';s.style.left=cx+'px';s.style.top=cy+'px';let a=Math.PI*2*i/10,d=60+Math.random()*70;s.style.setProperty('--x',Math.cos(a)*d+'px');s.style.setProperty('--y',Math.sin(a)*d-45+'px');document.body.appendChild(s);s.onanimationend=()=>s.remove()}}
 preloadAnimatedAssets();
-el.start.onclick=()=>{el.title.classList.add('hide');el.play.classList.remove('hide');q()};
+preloadOpeningAssets().then(handleOpeningOrientation);
+const openingOrientationQuery=matchMedia('(orientation:portrait)');
+if(openingOrientationQuery.addEventListener)openingOrientationQuery.addEventListener('change',handleOpeningOrientation);else openingOrientationQuery.addListener(handleOpeningOrientation);
+window.addEventListener('resize',handleOpeningOrientation);
+el.start.onclick=beginOpeningExit;
+handleOpeningOrientation();
 </script>
 </body></html>
