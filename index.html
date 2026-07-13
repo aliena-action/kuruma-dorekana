@@ -66,6 +66,8 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .choice .carAnimated[data-car-id="dump"]{transform:translateY(-3px) scale(1.34);transform-origin:50% 100%}
 .choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit .85s ease-in forwards}
 .choice .carAnimated[data-car-id="wrecker"]{transform:scale(1.14);transform-origin:50% 100%}
+.wreckerCar .bodyLayer{transition:none}
+.wreckerCar .tireLayer{-webkit-mask-image:radial-gradient(circle at 24% 90%,#000 0 10.5%,transparent 11%),radial-gradient(circle at 68% 90%,#000 0 10.5%,transparent 11%);-webkit-mask-repeat:no-repeat;mask-image:radial-gradient(circle at 24% 90%,#000 0 10.5%,transparent 11%),radial-gradient(circle at 68% 90%,#000 0 10.5%,transparent 11%);mask-repeat:no-repeat}
 .choice.rescueActive .carPose,.choice.wreckerCargoWaiting .carPose{animation-play-state:paused}
 .choice.wreckerBacking{--wrecker-back-x:clamp(80px,16vw,120px);animation:wreckerBack .21s ease-out both}
 .choice.wreckerHooked .carAnimated{transform:translateY(-4px) rotate(2deg);transform-origin:40% 85%;transition:transform .12s ease-out}
