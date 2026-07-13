@@ -66,8 +66,11 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .choice .carAnimated[data-car-id="dump"]{transform:translateY(-3px) scale(1.34);transform-origin:50% 100%}
 .choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit .85s ease-in forwards}
 .choice .carAnimated[data-car-id="wrecker"]{transform:scale(1.14);transform-origin:50% 100%}
-.choice.wreckerHooked .carAnimated{transform:translateX(clamp(-120px,-16vw,-80px)) translateY(-3px) rotate(2deg);transform-origin:40% 85%;transition:transform .1s ease-out}
-.choice.wreckerTowExit,.choice.wreckerCargoExit{animation:wreckerPairExit .78s cubic-bezier(.55,.02,.86,.38) both;pointer-events:none}
+.choice.rescueActive .carPose,.choice.wreckerCargoWaiting .carPose{animation-play-state:paused}
+.choice.wreckerBacking{--wrecker-back-x:clamp(80px,16vw,120px);animation:wreckerBack .21s ease-out both}
+.choice.wreckerHooked .carAnimated{transform:translateY(-4px) rotate(2deg);transform-origin:40% 85%;transition:transform .12s ease-out}
+.choice.wreckerTowExit{animation:wreckerLeadExit .78s cubic-bezier(.55,.02,.86,.38) both;pointer-events:none}
+.choice.wreckerCargoExit{animation:wreckerCargoExit .78s cubic-bezier(.55,.02,.86,.38) both;pointer-events:none}
 .choice.rescueGone{visibility:hidden;pointer-events:none}
 .carPose{display:block;position:relative;width:100%;height:100%;animation:idlePose 2.6s ease-in-out infinite;animation-delay:var(--idle-delay,0s);transform-origin:50% 82%}
 .carPose.correctPose{animation:correctPose .7s ease-out both}
@@ -116,7 +119,9 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 @keyframes wrongPose{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(4px) scale(1.04,.9)}70%{transform:translateY(1px) scale(.98,1.03)}}
 @keyframes funPose{0%,100%{transform:translateY(0) scale(1) rotate(0)}18%{transform:translateY(2px) scale(1.02,.97) rotate(-1.4deg)}48%{transform:translateY(-5px) scale(.99,1.03) rotate(1.2deg)}72%{transform:translateY(1px) scale(1.01,.98) rotate(-.8deg)}}
 @keyframes dumpExit{0%{transform:translateX(0) translateY(-3px) scale(1.34)}18%{transform:translateX(-18vw) translateY(-3px) scale(1.34)}100%{transform:translateX(-128vw) translateY(-3px) scale(1.34)}}
-@keyframes wreckerPairExit{0%{transform:translateX(0)}100%{transform:translateX(-128vw)}}
+@keyframes wreckerBack{0%{transform:translateX(0)}100%{transform:translateX(var(--wrecker-back-x))}}
+@keyframes wreckerLeadExit{0%{transform:translateX(var(--wrecker-back-x))}100%{transform:translateX(calc(-128vw + var(--wrecker-back-x)))}}
+@keyframes wreckerCargoExit{0%{transform:translateX(0)}100%{transform:translateX(-128vw)}}
 @keyframes effectPop{0%{opacity:0;transform:scale(.8)}22%{opacity:.9;transform:scale(1.04)}100%{opacity:0;transform:scale(1.18)}}
 @keyframes becon{0%,100%{transform:translateX(0) scale(1)}28%{transform:translateX(-5px) scale(1.06,.9)}52%{transform:translateX(4px) scale(.96,1.05)}76%{transform:translateX(-2px) scale(1.02,.98)}}
 @keyframes jump{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-34px) scale(1.08)}60%{transform:translateY(4px) scale(.98)}}
@@ -224,8 +229,8 @@ class WreckerController{
   clearTimers(){this.timers.forEach(clearTimeout);this.timers=[];if(this.blinkTimer){clearTimeout(this.blinkTimer);this.blinkTimer=null}}
   cleanup(){this.disposed=true;this.clearTimers();if(this.exitListener){this.button.removeEventListener('animationend',this.exitListener);this.exitListener=null}}
   scheduleBlink(){if(this.disposed||this.busy||this.state!=='idle')return;this.blinkTimer=setTimeout(()=>{this.blinkTimer=null;if(this.disposed||this.busy)return;this.state='blink';this.setFrame('normal','blink');this.timers.push(setTimeout(()=>{if(this.disposed||this.busy)return;this.setFrame('normal','normal');this.state='idle';this.scheduleBlink()},120))},3500+Math.random()*3500)}
-  playTow(middle,done){if(this.disposed||this.busy||!wreckerAssetsReady)return false;this.busy=true;this.state='tow';this.clearTimers();this.setFrame('tow01','fun');this.timers.push(setTimeout(()=>this.setFrame('tow02','fun'),200));this.timers.push(setTimeout(()=>middle.classList.add('wreckerHooked'),420));this.timers.push(setTimeout(()=>this.startExit(middle,done),520));return true}
-  startExit(middle,done){if(this.disposed)return;let finished=false,finish=()=>{if(finished||this.disposed)return;finished=true;if(this.exitListener){this.button.removeEventListener('animationend',this.exitListener);this.exitListener=null}this.busy=false;done()};this.exitListener=e=>{if(e.target===this.button&&e.animationName==='wreckerPairExit')finish()};this.button.addEventListener('animationend',this.exitListener);this.button.classList.add('wreckerTowExit');middle.classList.add('wreckerCargoExit');this.timers.push(setTimeout(finish,820))}
+  playTow(middle,done){if(this.disposed||this.busy||!wreckerAssetsReady)return false;this.busy=true;this.state='tow';this.clearTimers();middle.classList.add('wreckerCargoWaiting');this.button.classList.add('wreckerBacking');this.setFrame('tow01','fun');this.timers.push(setTimeout(()=>this.setFrame('tow02','fun'),210));this.timers.push(setTimeout(()=>middle.classList.add('wreckerHooked'),410));this.timers.push(setTimeout(()=>this.startExit(middle,done),540));return true}
+  startExit(middle,done){if(this.disposed)return;let finished=false,finish=()=>{if(finished||this.disposed)return;finished=true;if(this.exitListener){this.button.removeEventListener('animationend',this.exitListener);this.exitListener=null}this.busy=false;done()};this.exitListener=e=>{if(e.target===this.button&&e.animationName==='wreckerLeadExit')finish()};this.button.addEventListener('animationend',this.exitListener);this.button.classList.add('wreckerTowExit');middle.classList.add('wreckerCargoExit');this.timers.push(setTimeout(finish,820))}
 }
 function openingIsPortrait(){return matchMedia('(orientation:portrait)').matches}
 function openingReducedMotion(){return matchMedia('(prefers-reduced-motion:reduce)').matches}
