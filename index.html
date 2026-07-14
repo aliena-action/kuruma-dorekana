@@ -43,7 +43,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .openingExiting .openingStartCar{visibility:visible;pointer-events:none}
 .openingPaused *{animation-play-state:paused!important}
 .play{position:absolute;inset:0;padding:0;overflow:hidden}
-.playViewport{position:fixed;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:url("assets/bg_road_day.png"),linear-gradient(#75d7ff 0 42%,#8ddd65 42% 48%,#b8b8b8 48% 100%);background-size:var(--play-stage-width) var(--play-stage-height),100% 100%;background-position:center;background-repeat:no-repeat}
+.playViewport{position:fixed;z-index:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:url("assets/bg_road_day.png"),linear-gradient(#75d7ff 0 42%,#8ddd65 42% 48%,#b8b8b8 48% 100%);background-size:auto var(--play-stage-height),100% 100%;background-position:34% center,center;background-repeat:no-repeat}
 .playStage{--play-scale:1;position:relative;flex:0 0 667px;width:667px;height:280px;overflow:hidden;transform:scale(var(--play-scale));transform-origin:center center}
 .sampleLane,.choiceLane{position:absolute;left:0;width:667px;min-height:0}
 .sampleLane{top:0;height:150px;display:flex;align-items:end;justify-content:center;pointer-events:none}
