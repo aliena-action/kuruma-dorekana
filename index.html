@@ -47,7 +47,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .playStage{--play-scale:1;position:relative;flex:0 0 667px;width:667px;height:280px;overflow:hidden;transform:scale(var(--play-scale));transform-origin:center center}
 .sampleLane,.choiceLane{position:absolute;left:0;width:667px;min-height:0}
 .sampleLane{top:0;height:150px;display:flex;align-items:end;justify-content:center;pointer-events:none}
-.choiceLane{top:136px;height:118px}
+.choiceLane{top:122px;height:132px}
 .car{display:block;width:148px;height:108px;filter:drop-shadow(0 8px 4px rgba(0,0,0,.16));pointer-events:none}
 .assetImg{display:none!important;width:100%;height:100%;object-fit:contain}
 .assetImg.ready{display:block!important}
@@ -58,13 +58,13 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .sampleMirror{display:block;transform:scaleX(-1)}
 .sample .carPose{animation:none;transform:none}
 .sample.sampleIdle .carPose:not(.correctPose):not(.wrongPose):not(.funPose){animation:idlePose 2.6s ease-in-out infinite;transform-origin:50% 82%}
-.choice{position:absolute;left:calc(var(--choice-center) - 87px);bottom:0;width:174px;height:118px;display:flex;align-items:end;justify-content:center;border:0;background:transparent;border-radius:24px;padding:5px 13px;cursor:pointer}
-.choice .car{width:148px;height:108px}
+.choice{position:absolute;left:calc(var(--choice-center) - 96px);bottom:0;width:192px;height:132px;display:flex;align-items:end;justify-content:center;border:0;background:transparent;border-radius:24px;padding:5px 13px;cursor:pointer}
+.choice .car{width:166px;height:122px}
 .choiceLane.groupIn{animation:choiceGroupDrive 3.2s linear both}
 .sampleIn{animation:sampleDrive 2.6s linear both}
 .wiggle{animation:becon .5s ease}
 .jump{animation:jump .72s cubic-bezier(.2,1.4,.35,1)}
-.carAnimated{position:relative;width:148px;height:108px}
+.carAnimated{position:relative;width:166px;height:122px}
 .sample .carAnimated{width:127px;height:127px}
 .choice .carAnimated[data-car-id="dump"]{transform:translateY(-3px) scale(1.34);transform-origin:50% 100%}
 .choice .carAnimated[data-car-id="dump"].dumpExit{animation:dumpExit .85s ease-in forwards}
@@ -138,7 +138,7 @@ const cars=[
 const guestCar={id:'dump',color:'#7d756b',guest:true};
 const wreckerCar={id:'wrecker',color:'#1874bd',guest:true,rescue:true};
 const RARE_INTERVAL_MIN=4,RARE_INTERVAL_MAX=6,RESCUE_INTERVAL_MIN=3,RESCUE_INTERVAL_MAX=4,CHOICE_START_DELAY_MS=2200;
-const PLAY_STAGE_WIDTH=667,PLAY_STAGE_HEIGHT=280,CHOICE_CENTERS=[117,333.5,550],WRECKER_BACK_X=112;
+const PLAY_STAGE_WIDTH=667,PLAY_STAGE_HEIGHT=280,CHOICE_CENTERS=[117,333.5,550],WRECKER_BACK_X=101;
 const wreckerAssets={
   body:{normal:'assets/animation/cars/car_wrecker/car_wrecker_body_normal.png',tow01:'assets/animation/cars/car_wrecker/car_wrecker_body_tow_01.png',tow02:'assets/animation/cars/car_wrecker/car_wrecker_body_tow_02.png'},
   eye:{normal:'assets/animation/cars/car_wrecker/car_wrecker_eye_normal.png',blink:'assets/animation/cars/car_wrecker/car_wrecker_eye_blink.png',fun:'assets/animation/cars/car_wrecker/car_wrecker_eye_fun.png'},
