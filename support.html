@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#fff8e9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="くるまどれかな？">
@@ -105,7 +106,7 @@ textarea{display:block;width:100%;min-height:150px;resize:vertical;border:1px so
 footer{padding:28px 22px calc(34px + env(safe-area-inset-bottom));color:#94867a;font-size:.72rem;line-height:1.8;text-align:center}
 footer p{margin:4px 0}
 .footerLinks{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 14px;margin:12px 0}
-.footerPlaceholder{white-space:nowrap}
+.footerPlaceholder{color:inherit;white-space:nowrap}
 .giftModal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding-top:max(24px,env(safe-area-inset-top));background:rgba(25,28,24,.58);backdrop-filter:blur(2px)}
 .giftSheet{position:relative;width:100%;max-width:480px;max-height:90vh;max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:28px 28px 0 0;padding:10px 20px calc(26px + env(safe-area-inset-bottom));background:#fffaf0;box-shadow:0 -8px 42px rgba(30,23,16,.28);animation:sheetUp .26s cubic-bezier(.2,.8,.2,1)}
 .sheetHandle{width:46px;height:5px;margin:0 auto 5px;border-radius:999px;background:#d8ccbd}
@@ -151,18 +152,16 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
   <header class="hero">
     <p class="eyebrow">ちいさな車あそび</p>
     <h1>くるまどれかな？</h1>
-    <p class="tagline">走ってきた車と、おなじ車を見つけよう。</p>
-    <p class="intro">文字を読まなくても遊べる、ちいさな子どものための無料・広告なしのWebゲームです。</p>
 
     <figure class="gamePreview" aria-label="実際のゲーム画面">
       <img src="assets/support-game-preview.jpg" alt="青空と道路の上に、緑の見本車と青・緑・赤の3台が並ぶゲーム画面">
     </figure>
 
-    <a class="primaryAction" id="playLink" href="./index.html"><span class="playIcon" aria-hidden="true">▶</span>ゲームをはじめる</a>
-
     <div class="trustRow" aria-label="利用条件">
-      <span>無料</span><span>登録なし</span><span>広告なし</span><span>文字なしでOK</span>
+      <span>無料</span><span>登録なし</span><span>広告なし</span><span>文字が読めなくてもOK</span>
     </div>
+
+    <a class="primaryAction" id="playLink" href="./index.html"><span class="playIcon" aria-hidden="true">▶</span>ゲームをはじめる</a>
 
     <section class="installGuide" id="installGuide" aria-labelledby="installTitle">
       <button class="iconButton" id="dismissInstall" type="button" aria-label="ホーム画面追加の案内を閉じる" title="閉じる">×</button>
@@ -179,7 +178,7 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
     <section class="contentSection" aria-labelledby="howToTitle">
       <p class="sectionKicker">HOW TO PLAY</p>
       <h2 id="howToTitle">見る、くらべる、えらぶ。</h2>
-      <p class="sectionCopy">上の道を走る車を見て、下の3台からおなじ車をタップします。文字を読まなくても、音を出さなくても遊べます。音を出すと、動きに合わせた音も楽しめます。</p>
+      <p class="sectionCopy">文字が読めなくても、音を出せない場所でも遊べます。</p>
       <div class="steps">
         <div class="step"><span class="stepNumber">1</span><div><strong>車が走ってくる</strong><small>いつもの車にまじって、ときどき、ちょっと変わった車もやってきます。</small></div></div>
         <div class="step"><span class="stepNumber">2</span><div><strong>おなじ車を見つける</strong><small>見つけたら、好きなタイミングでタップ。</small></div></div>
@@ -197,9 +196,9 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
       </div>
 
     <section class="card feedbackCard" aria-labelledby="feedbackTitle">
-      <p class="cardKicker">MONITOR TEST</p>
+      <p class="cardKicker">FEEDBACK</p>
       <h3 id="feedbackTitle">遊んだ感想を送る</h3>
-      <p class="cardLead">これからの遊びやすさを考える参考にします。現在は確認用のため、入力内容は外部へ送信されません。</p>
+      <p class="cardLead">遊んでいる様子を、これからの遊びやすさや、新しい車づくりの参考にします。お名前や連絡先は必要ありません。</p>
       <button class="secondaryAction" id="feedbackToggle" type="button" aria-expanded="false" aria-controls="feedbackPanel">感想を送る</button>
 
       <div class="formPanel" id="feedbackPanel" hidden>
@@ -243,7 +242,8 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
           </fieldset>
 
           <label class="freeTextLabel" for="feedbackText">自由記入欄<span class="optional">任意</span></label>
-          <textarea id="feedbackText" name="feedback" placeholder="遊んでいる様子や、気になったことがあれば教えてください"></textarea>
+          <small class="optional" id="feedbackPrivacyNote">お名前や連絡先など、個人を特定できる情報は入力しないでください。</small>
+          <textarea id="feedbackText" name="feedback" aria-describedby="feedbackPrivacyNote" placeholder="遊んでいる様子や、気になったことがあれば教えてください"></textarea>
           <p class="formError" id="feedbackError" role="alert" tabindex="-1" hidden></p>
           <button class="submitAction" type="submit">感想を送る</button>
         </form>
@@ -270,8 +270,8 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
   <footer>
     <p><strong>くるまどれかな？</strong>｜無料のWeb版</p>
     <div class="footerLinks" aria-label="ご案内">
-      <span class="footerPlaceholder">プライバシーについて（準備中）</span>
-      <span class="footerPlaceholder">お問い合わせ（準備中）</span>
+      <a class="footerPlaceholder" href="./privacy.html">プライバシーについて</a>
+      <a class="footerPlaceholder" href="mailto:tokiabe@icloud.com?subject=%E3%81%8F%E3%82%8B%E3%81%BE%E3%81%A9%E3%82%8C%E3%81%8B%E3%81%AA%EF%BC%9F%E3%81%B8%E3%81%AE%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B">お問い合わせ</a>
     </div>
     <p>© 2026</p>
   </footer>
@@ -305,9 +305,8 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
     </fieldset>
 
     <button class="giftPay" id="giftPay" type="button">¥200 をギフトとしておくる</button>
-    <p class="giftStatus" id="giftStatus" role="status" hidden>確認用です。実際の決済はまだ行われません。</p>
+    <p class="giftStatus" id="giftStatus" role="status" hidden>ギフト機能は現在準備中です。</p>
     <p class="giftFootnote">一回だけの応援です。<br>支援の有無でゲーム内容は変わりません。</p>
-    <p class="giftFootnote">今後はStripeの安全な決済画面へ移動する予定です。現在は確認用のため、実際の決済は実行されません。</p>
   </section>
 </div>
 
