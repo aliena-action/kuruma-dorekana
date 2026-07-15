@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eaf8ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="くるまどれかな？">
+<link rel="icon" href="data:,">
+<title>くるまどれかな？｜保護者の方へ</title>
+<script>
+try{if(localStorage.getItem('kurumaSupportInstallGuideDismissed')==='1')document.documentElement.classList.add('installGuideDismissed')}catch{}
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --ink:#263849;
+  --muted:#60717f;
+  --sky:#eaf8ff;
+  --paper:#ffffff;
+  --line:#cbdce5;
+  --green:#087f78;
+  --green-dark:#05645f;
+  --yellow:#ffd866;
+  --yellow-soft:#fff7d7;
+  --coral:#e96c5b;
+  --focus:#0b64d8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--sky)}
+body{margin:0;min-width:280px;color:var(--ink);background:var(--sky);font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:16px;line-height:1.7;-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+button{color:inherit}
+[hidden]{display:none!important}
+.page{width:100%;max-width:520px;min-height:100vh;margin:0 auto;background:var(--paper)}
+.hero{padding:calc(28px + env(safe-area-inset-top)) 20px 24px;border-top:8px solid var(--yellow);border-bottom:6px solid #84c96f;background:var(--sky)}
+.eyebrow{margin:0 0 4px;color:var(--green);font-size:.875rem;font-weight:800}
+h1{margin:0;font-size:2.5rem;line-height:1.2;letter-spacing:0;color:#24496b}
+.tagline{margin:8px 0 0;font-size:1.05rem;font-weight:800}
+.intro{margin:12px 0 20px;color:#435867}
+.primaryAction,.supportAction,.submitAction,.giftPay{display:flex;width:100%;min-height:56px;align-items:center;justify-content:center;border:0;border-radius:8px;padding:13px 18px;font-weight:900;text-align:center;text-decoration:none;cursor:pointer}
+.primaryAction{color:#fff;background:var(--green);box-shadow:0 4px 0 var(--green-dark)}
+.primaryAction:active{transform:translateY(2px);box-shadow:0 2px 0 var(--green-dark)}
+.primaryAction .arrow{margin-left:8px;font-size:1.2rem}
+.installGuide{position:relative;margin-top:20px;padding:16px 44px 16px 16px;border:1px solid #bdd7e4;border-radius:8px;background:#fff}
+.installGuideDismissed .installGuide{display:none}
+.installGuide h2{margin:0;font-size:1rem;line-height:1.45}
+.installGuide>p{margin:5px 0 12px;color:var(--muted);font-size:.9rem}
+.installSteps{display:grid;gap:8px}
+.installStep{margin:0;padding-left:10px;border-left:3px solid var(--yellow);font-size:.875rem}
+.platform{display:inline-block;min-width:68px;font-weight:900}
+.iconButton{position:absolute;top:8px;right:8px;width:36px;height:36px;border:0;background:transparent;border-radius:50%;font-size:1.5rem;line-height:1;cursor:pointer}
+.iconButton:hover{background:#edf5f8}
+main{padding:24px 16px 36px}
+.quietNote{margin:0 4px 24px;color:var(--muted);font-size:.925rem;text-align:center}
+.card{margin-top:16px;padding:20px 16px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 3px 12px rgba(42,73,91,.08)}
+.card h2{margin:0;font-size:1.3rem;line-height:1.4;letter-spacing:0}
+.cardLead{margin:7px 0 16px;color:var(--muted)}
+.secondaryAction{display:inline-flex;min-height:48px;align-items:center;justify-content:center;border:2px solid var(--green);border-radius:8px;padding:9px 18px;color:var(--green-dark);background:#fff;font-weight:900;cursor:pointer}
+.formPanel{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+fieldset{margin:0 0 22px;padding:0;border:0}
+fieldset.hasError{padding:10px;border:2px solid var(--coral);border-radius:8px}
+legend{width:100%;margin-bottom:9px;font-weight:900;line-height:1.5}
+.requirement{margin-left:6px;color:#b33e31;font-size:.75rem}
+.optional{margin-left:6px;color:var(--muted);font-size:.75rem;font-weight:500}
+.optionList{display:grid;gap:8px}
+.option{display:flex;min-height:46px;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#f9fcfd;cursor:pointer}
+.option:has(input:checked){border-color:var(--green);background:#e7f7f3;font-weight:800}
+.option input{flex:0 0 auto;width:20px;height:20px;margin:0;accent-color:var(--green)}
+.freeTextLabel{display:block;margin-bottom:8px;font-weight:900}
+textarea{display:block;width:100%;min-height:150px;resize:vertical;border:1px solid #9db2be;border-radius:8px;padding:12px;color:var(--ink);background:#fff;line-height:1.6}
+.formError{margin:14px 0 0;padding:10px 12px;border-left:4px solid var(--coral);color:#842c22;background:#fff0ed;font-weight:800}
+.submitAction{margin-top:16px;color:#fff;background:var(--green)}
+.thanks{padding:18px 0 2px;text-align:center}
+.thanks strong{display:block;margin-bottom:12px;font-size:1.12rem}
+.supportCard{border-color:#e5c759;background:var(--yellow-soft)}
+.supportAction{color:#3a310d;background:var(--yellow);box-shadow:0 4px 0 #d0a925}
+.supportNote{margin:12px 0 0;color:#665b35;font-size:.85rem}
+footer{padding:22px 18px calc(26px + env(safe-area-inset-bottom));border-top:1px solid var(--line);color:var(--muted);background:#f5fafc;text-align:center}
+footer p{margin:4px 0}
+.footerLinks{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 14px;margin:12px 0;font-size:.875rem}
+.footerPlaceholder{white-space:nowrap}
+.giftModal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;padding-top:max(24px,env(safe-area-inset-top));background:rgba(20,35,45,.48)}
+.giftSheet{position:relative;width:100%;max-width:520px;max-height:90vh;max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:8px 8px 0 0;padding:14px 18px calc(22px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -8px 30px rgba(10,27,38,.24);animation:sheetUp .24s ease-out}
+.sheetHandle{width:44px;height:5px;margin:0 auto 10px;border-radius:3px;background:#bfd0d8}
+.sheetClose{position:sticky;z-index:2;top:0;float:right;min-width:66px;min-height:42px;border:1px solid var(--line);border-radius:8px;padding:7px 12px;background:#fff;font-weight:800;cursor:pointer}
+.futureCars{display:block;clear:both;width:100%;height:auto;max-height:92px;margin:0 auto 8px;object-fit:contain;background:transparent}
+.giftSheet h2{clear:both;margin:6px 0 7px;font-size:1.45rem;line-height:1.4}
+.giftIntro{margin:0 0 18px;color:#4b5f6d}
+.amountChoices{display:grid;gap:9px;margin:0 0 18px;padding:0;border:0}
+.amountChoices legend{margin-bottom:8px}
+.amountOption{display:grid;grid-template-columns:28px 82px 1fr;min-height:58px;align-items:center;border:2px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;cursor:pointer}
+.amountOption:has(input:checked){border-color:var(--green);background:#e7f7f3;box-shadow:inset 5px 0 var(--green)}
+.amountOption input{width:20px;height:20px;margin:0;accent-color:var(--green)}
+.amount{font-size:1.08rem;font-weight:900}
+.amountCaption{color:#546875;font-size:.875rem}
+.giftPay{color:#fff;background:var(--green)}
+.giftStatus{margin:12px 0 0;padding:11px;border-radius:8px;color:#34535e;background:#eaf8ff;font-weight:800;text-align:center}
+.giftFootnote{margin:16px 0 0;color:var(--muted);font-size:.85rem}
+body.sheetOpen{overflow:hidden}
+body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+@keyframes sheetUp{from{transform:translateY(35px)}to{transform:translateY(0)}}
+@media(min-width:600px){
+  body{padding:32px 0}
+  .page{min-height:calc(100vh - 64px);border:1px solid #c9dde6;border-radius:8px;overflow:hidden;box-shadow:0 12px 34px rgba(38,72,91,.13)}
+  .hero{padding-right:32px;padding-left:32px}
+  main{padding-right:28px;padding-left:28px}
+  .giftModal{align-items:center;padding:28px}
+  .giftSheet{border-radius:8px;max-height:calc(100dvh - 56px)}
+}
+@media(max-width:340px){
+  h1{font-size:2rem}
+  .hero{padding-right:14px;padding-left:14px}
+  main{padding-right:10px;padding-left:10px}
+  .card{padding-right:13px;padding-left:13px}
+  .amountOption{grid-template-columns:26px 70px 1fr;padding-right:8px;padding-left:8px}
+  .amountCaption{font-size:.8rem}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.giftSheet{animation:none}.primaryAction:active{transform:none}}
+</style>
+</head>
+<body>
+<div class="page" id="pageContent">
+  <header class="hero">
+    <p class="eyebrow">保護者の方へ</p>
+    <h1>くるまどれかな？</h1>
+    <p class="tagline">ちいさな子どものための、シンプルなくるまあそび</p>
+    <p class="intro">走ってきた車と、おなじ車を見つけよう。<br>文字を読まなくても遊べる、無料・広告なしのWebゲームです。</p>
+    <a class="primaryAction" id="playLink" href="./index.html">ゲームをはじめる<span class="arrow" aria-hidden="true">→</span></a>
+
+    <section class="installGuide" id="installGuide" aria-labelledby="installTitle">
+      <button class="iconButton" id="dismissInstall" type="button" aria-label="ホーム画面追加の案内を閉じる" title="閉じる">×</button>
+      <h2 id="installTitle">また遊ぶときのために</h2>
+      <p>このページをホーム画面に追加しておくと便利です。</p>
+      <div class="installSteps">
+        <p class="installStep"><span class="platform">iPhone</span>Safariの共有ボタン →「ホーム画面に追加」</p>
+        <p class="installStep"><span class="platform">Android</span>ブラウザのメニュー →「ホーム画面に追加」</p>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <p class="quietNote">むずかしい説明や登録はありません。黄色いボタンから、すぐに遊べます。</p>
+
+    <section class="card" aria-labelledby="feedbackTitle">
+      <h2 id="feedbackTitle">遊んだ感想を送る</h2>
+      <p class="cardLead">これからの遊びやすさを考える参考にします。現在は確認用のため、入力内容は外部へ送信されません。</p>
+      <button class="secondaryAction" id="feedbackToggle" type="button" aria-expanded="false" aria-controls="feedbackPanel">感想を送る</button>
+
+      <div class="formPanel" id="feedbackPanel" hidden>
+        <form id="feedbackForm" novalidate>
+          <fieldset data-required-group="independence">
+            <legend>お子さんは、どのくらい自分で遊べましたか？<span class="requirement">必須</span></legend>
+            <div class="optionList">
+              <label class="option"><input type="radio" name="independence" value="ひとりで遊べた">ひとりで遊べた</label>
+              <label class="option"><input type="radio" name="independence" value="少し手伝った">少し手伝った</label>
+              <label class="option"><input type="radio" name="independence" value="かなり手伝った">かなり手伝った</label>
+            </div>
+          </fieldset>
+
+          <fieldset data-required-group="again">
+            <legend>また遊びたそうでしたか？<span class="requirement">必須</span></legend>
+            <div class="optionList">
+              <label class="option"><input type="radio" name="again" value="はい">はい</label>
+              <label class="option"><input type="radio" name="again" value="どちらともいえない">どちらともいえない</label>
+              <label class="option"><input type="radio" name="again" value="いいえ">いいえ</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>お子さんの年齢<span class="optional">任意</span></legend>
+            <div class="optionList">
+              <label class="option"><input type="radio" name="age" value="2〜3歳">2〜3歳</label>
+              <label class="option"><input type="radio" name="age" value="4〜5歳">4〜5歳</label>
+              <label class="option"><input type="radio" name="age" value="6歳以上">6歳以上</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>手伝ったところがあれば教えてください<span class="optional">任意・複数選択</span></legend>
+            <div class="optionList">
+              <label class="option"><input type="checkbox" name="help" value="始め方">始め方</label>
+              <label class="option"><input type="checkbox" name="help" value="同じ車を見つける">同じ車を見つける</label>
+              <label class="option"><input type="checkbox" name="help" value="タップ操作">タップ操作</label>
+              <label class="option"><input type="checkbox" name="help" value="待ち時間">待ち時間</label>
+              <label class="option"><input type="checkbox" name="help" value="その他">その他</label>
+            </div>
+          </fieldset>
+
+          <label class="freeTextLabel" for="feedbackText">自由記入欄<span class="optional">任意</span></label>
+          <textarea id="feedbackText" name="feedback" placeholder="遊んでいる様子や、気になったことがあれば教えてください"></textarea>
+          <p class="formError" id="feedbackError" role="alert" tabindex="-1" hidden></p>
+          <button class="submitAction" type="submit">感想を送る</button>
+        </form>
+      </div>
+
+      <div class="thanks" id="feedbackThanks" role="status" hidden>
+        <strong>感想をありがとうございました。</strong>
+        <button class="secondaryAction" id="feedbackAgain" type="button">もう一度感想を送る</button>
+      </div>
+    </section>
+
+    <section class="card supportCard" aria-labelledby="supportTitle">
+      <h2 id="supportTitle">このゲームを応援する</h2>
+      <p class="cardLead">「くるまどれかな？」は、これからも無料・広告なしで遊べます。気に入っていただけたら、新しい車やアニメーション、将来のアプリ版をつくるために、任意で小さなギフトをおくれます。</p>
+      <button class="supportAction" id="giftOpen" type="button" aria-haspopup="dialog">開発にギフトをおくる</button>
+      <p class="supportNote">支援しなくても、遊べる内容は変わりません。<br>ここから先は保護者の方のページです。</p>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>くるまどれかな？</strong>｜無料のWeb版</p>
+    <div class="footerLinks" aria-label="ご案内">
+      <span class="footerPlaceholder">プライバシーについて（準備中）</span>
+      <span class="footerPlaceholder">お問い合わせ（準備中）</span>
+    </div>
+    <p>© 2026</p>
+  </footer>
+</div>
+
+<div class="giftModal" id="giftModal" role="dialog" aria-modal="true" aria-labelledby="giftTitle" hidden>
+  <section class="giftSheet" id="giftSheet">
+    <div class="sheetHandle" aria-hidden="true"></div>
+    <button class="sheetClose" id="giftClose" type="button" aria-label="ギフト画面を閉じる">もどる</button>
+    <img class="futureCars" src="assets/future-cars-strip.png" alt="これから増えるかもしれない、はたらく車たち" onerror="this.hidden=true">
+    <h2 id="giftTitle">このゲームを応援する</h2>
+    <p class="giftIntro">遊ぶための支払いではありません。<br>気に入っていただけたときだけ、<br>開発に小さなギフトをおくれます。</p>
+
+    <fieldset class="amountChoices">
+      <legend>ギフトの金額</legend>
+      <label class="amountOption">
+        <input type="radio" name="giftAmount" value="200" checked>
+        <span class="amount">¥200</span>
+        <span class="amountCaption">ちいさなギフト</span>
+      </label>
+      <label class="amountOption">
+        <input type="radio" name="giftAmount" value="500">
+        <span class="amount">¥500</span>
+        <span class="amountCaption">次の車づくりを応援</span>
+      </label>
+      <label class="amountOption">
+        <input type="radio" name="giftAmount" value="1000">
+        <span class="amount">¥1,000</span>
+        <span class="amountCaption">アプリ版への一歩</span>
+      </label>
+    </fieldset>
+
+    <button class="giftPay" id="giftPay" type="button">¥200 をギフトとしておくる</button>
+    <p class="giftStatus" id="giftStatus" role="status" hidden>確認用です。実際の決済はまだ行われません。</p>
+    <p class="giftFootnote">一回だけの応援です。<br>支援の有無でゲーム内容は変わりません。</p>
+    <p class="giftFootnote">今後はStripeの安全な決済画面へ移動する予定です。現在は確認用のため、実際の決済は実行されません。</p>
+  </section>
+</div>
+
+<script>
+const installGuide=document.getElementById('installGuide');
+const dismissInstall=document.getElementById('dismissInstall');
+const feedbackToggle=document.getElementById('feedbackToggle');
+const feedbackPanel=document.getElementById('feedbackPanel');
+const feedbackForm=document.getElementById('feedbackForm');
+const feedbackError=document.getElementById('feedbackError');
+const feedbackThanks=document.getElementById('feedbackThanks');
+const feedbackAgain=document.getElementById('feedbackAgain');
+const giftOpen=document.getElementById('giftOpen');
+const giftModal=document.getElementById('giftModal');
+const giftSheet=document.getElementById('giftSheet');
+const giftClose=document.getElementById('giftClose');
+const giftPay=document.getElementById('giftPay');
+const giftStatus=document.getElementById('giftStatus');
+const pageContent=document.getElementById('pageContent');
+let giftReturnFocus=null;
+let pageScrollY=0;
+
+dismissInstall.addEventListener('click',()=>{
+  installGuide.hidden=true;
+  try{localStorage.setItem('kurumaSupportInstallGuideDismissed','1')}catch{}
+});
+
+function setFeedbackOpen(open){
+  feedbackPanel.hidden=!open;
+  feedbackToggle.setAttribute('aria-expanded',String(open));
+  feedbackToggle.textContent=open?'感想フォームを閉じる':'感想を送る';
+  if(open)feedbackPanel.querySelector('input,textarea,button')?.focus();
+}
+
+feedbackToggle.addEventListener('click',()=>setFeedbackOpen(feedbackPanel.hidden));
+
+feedbackForm.addEventListener('submit',event=>{
+  event.preventDefault();
+  const missing=[];
+  feedbackForm.querySelectorAll('[data-required-group]').forEach(fieldset=>{
+    const name=fieldset.dataset.requiredGroup;
+    const valid=Boolean(feedbackForm.querySelector(`input[name="${name}"]:checked`));
+    fieldset.classList.toggle('hasError',!valid);
+    fieldset.setAttribute('aria-invalid',String(!valid));
+    if(!valid)missing.push(fieldset);
+  });
+  if(missing.length){
+    feedbackError.textContent='必須の2つの質問を選んでください。';
+    feedbackError.hidden=false;
+    feedbackError.focus();
+    missing[0].querySelector('input')?.focus();
+    return;
+  }
+  feedbackError.hidden=true;
+  feedbackForm.reset();
+  feedbackPanel.hidden=true;
+  feedbackToggle.hidden=true;
+  feedbackToggle.setAttribute('aria-expanded','false');
+  feedbackThanks.hidden=false;
+  feedbackThanks.querySelector('strong')?.focus?.();
+});
+
+feedbackForm.addEventListener('change',event=>{
+  const fieldset=event.target.closest('[data-required-group]');
+  if(fieldset){fieldset.classList.remove('hasError');fieldset.setAttribute('aria-invalid','false')}
+  if(feedbackForm.querySelector('input[name="independence"]:checked')&&feedbackForm.querySelector('input[name="again"]:checked'))feedbackError.hidden=true;
+});
+
+feedbackAgain.addEventListener('click',()=>{
+  feedbackThanks.hidden=true;
+  feedbackToggle.hidden=false;
+  setFeedbackOpen(true);
+});
+
+function updateGiftButton(){
+  const selected=document.querySelector('input[name="giftAmount"]:checked');
+  const formatted=Number(selected?.value||200).toLocaleString('ja-JP');
+  giftPay.textContent=`¥${formatted} をギフトとしておくる`;
+  giftStatus.hidden=true;
+}
+
+document.querySelectorAll('input[name="giftAmount"]').forEach(input=>input.addEventListener('change',updateGiftButton));
+
+function openGiftSheet(){
+  giftReturnFocus=document.activeElement;
+  pageScrollY=window.scrollY;
+  pageContent.style.top=`-${pageScrollY}px`;
+  document.body.classList.add('sheetOpen');
+  pageContent.setAttribute('aria-hidden','true');
+  if('inert' in pageContent)pageContent.inert=true;
+  giftModal.hidden=false;
+  giftStatus.hidden=true;
+  giftClose.focus();
+}
+
+function closeGiftSheet(){
+  if(giftModal.hidden)return;
+  giftModal.hidden=true;
+  document.body.classList.remove('sheetOpen');
+  pageContent.style.top='';
+  pageContent.removeAttribute('aria-hidden');
+  if('inert' in pageContent)pageContent.inert=false;
+  window.scrollTo(0,pageScrollY);
+  giftReturnFocus?.focus();
+}
+
+giftOpen.addEventListener('click',openGiftSheet);
+giftClose.addEventListener('click',closeGiftSheet);
+giftModal.addEventListener('click',event=>{if(event.target===giftModal)closeGiftSheet()});
+giftPay.addEventListener('click',()=>{giftStatus.hidden=false;giftStatus.focus?.()});
+
+document.addEventListener('keydown',event=>{
+  if(giftModal.hidden)return;
+  if(event.key==='Escape'){event.preventDefault();closeGiftSheet();return}
+  if(event.key!=='Tab')return;
+  const focusable=[...giftSheet.querySelectorAll('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),a[href]')].filter(element=>element.offsetParent!==null);
+  if(!focusable.length)return;
+  const first=focusable[0];
+  const last=focusable[focusable.length-1];
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+});
+</script>
+</body>
+</html>
