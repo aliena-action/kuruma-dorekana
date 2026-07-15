@@ -243,7 +243,7 @@ body.sheetOpen .page{position:fixed;left:0;right:0;width:100%}
 
           <label class="freeTextLabel" for="feedbackText">自由記入欄<span class="optional">任意</span></label>
           <small class="optional" id="feedbackPrivacyNote">お名前や連絡先など、個人を特定できる情報は入力しないでください。</small>
-          <textarea id="feedbackText" name="feedback" aria-describedby="feedbackPrivacyNote" placeholder="遊んでいる様子や、気になったことがあれば教えてください"></textarea>
+          <textarea id="feedbackText" name="feedback" maxlength="300" aria-describedby="feedbackPrivacyNote" placeholder="遊んでいる様子や、気になったことがあれば教えてください"></textarea>
           <p class="formError" id="feedbackError" role="alert" tabindex="-1" hidden></p>
           <button class="submitAction" type="submit">感想を送る</button>
         </form>
@@ -343,8 +343,33 @@ function setFeedbackOpen(open){
 
 feedbackToggle.addEventListener('click',()=>setFeedbackOpen(feedbackPanel.hidden));
 
-feedbackForm.addEventListener('submit',event=>{
+const feedbackSubmit=feedbackForm.querySelector('.submitAction');
+const feedbackValueMap={
+  independence:{'ひとりで遊べた':'independent','少し手伝った':'some_help','かなり手伝った':'much_help'},
+  again:{'はい':'yes','どちらともいえない':'unsure','いいえ':'no'},
+  age:{'2〜3歳':'age_2_3','4〜5歳':'age_4_5','6歳以上':'age_6_plus'},
+  help:{'始め方':'getting_started','同じ車を見つける':'finding_same_car','タップ操作':'tapping','待ち時間':'waiting','その他':'other'}
+};
+let feedbackSending=false;
+
+function buildFeedbackPayload(){
+  const payload={
+    independence:feedbackValueMap.independence[feedbackForm.querySelector('input[name="independence"]:checked').value],
+    replay_interest:feedbackValueMap.again[feedbackForm.querySelector('input[name="again"]:checked').value],
+    help_areas:[...feedbackForm.querySelectorAll('input[name="help"]:checked')].map(input=>feedbackValueMap.help[input.value])
+  };
+  const ageChecked=feedbackForm.querySelector('input[name="age"]:checked');
+  const ageGroup=ageChecked?feedbackValueMap.age[ageChecked.value]:null;
+  const trimmed=document.getElementById('feedbackText').value.trim();
+  const comment=trimmed===''?null:trimmed;
+  if(ageGroup!==null)payload.age_group=ageGroup;
+  if(comment!==null)payload.comment=comment;
+  return payload;
+}
+
+feedbackForm.addEventListener('submit',async event=>{
   event.preventDefault();
+  if(feedbackSending)return;
   const missing=[];
   feedbackForm.querySelectorAll('[data-required-group]').forEach(fieldset=>{
     const name=fieldset.dataset.requiredGroup;
@@ -361,6 +386,33 @@ feedbackForm.addEventListener('submit',event=>{
     return;
   }
   feedbackError.hidden=true;
+  const payload=buildFeedbackPayload();
+  feedbackSending=true;
+  feedbackSubmit.disabled=true;
+  feedbackSubmit.textContent='送信中…';
+  let succeeded=false;
+  try{
+    const res=await fetch('/api/feedback',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(payload)
+    });
+    if(res.status===201){
+      const result=await res.json();
+      succeeded=result&&result.ok===true;
+    }
+  }catch{}
+  feedbackSending=false;
+  feedbackSubmit.disabled=false;
+  feedbackSubmit.textContent='感想を送る';
+  if(!succeeded){
+    feedbackError.textContent='送信できませんでした。時間をおいて、もう一度お試しください。';
+    feedbackError.hidden=false;
+    feedbackError.focus();
+    return;
+  }
   feedbackForm.reset();
   feedbackPanel.hidden=true;
   feedbackToggle.hidden=true;
