@@ -3,13 +3,10 @@
  * 「くるまどれかな?」保護者向け感想フォームの受信エンドポイント。
  * Cloudflare Pages Functions + D1 で動作する。
  *
- * 保存するのは feedback テーブルの列に対応する値のみ。
+ * 感想はD1へ保存し、同時に運営者メールへ通知する。
  * User-Agent・IPアドレス等のリクエストメタデータは一切読み取らず、保存もしない。
  */
 
-// 許可値の一元管理。
-// ここを変更した場合は migrations/0001_create_feedback.sql の CHECK 制約も
-// 必ず同期させること(help_areas は SQL 側に CHECK が無いためコード側のみ)。
 export const ALLOWED_VALUES = {
   independence: ["independent", "some_help", "much_help"],
   replay_interest: ["yes", "unsure", "no"],
@@ -20,11 +17,34 @@ export const ALLOWED_VALUES = {
 export const COMMENT_MAX_LENGTH = 300;
 export const MAX_HELP_AREAS = 5;
 const MAX_BODY_BYTES = 4096;
-
-// 受理するフィールドはこの5つだけ。それ以外のキーは 400 で拒否する。
+const FEEDBACK_EMAIL_ENDPOINT = "https://formsubmit.co/ajax/tokiabe@icloud.com";
 const ACCEPTED_FIELDS = ["independence", "replay_interest", "age_group", "help_areas", "comment"];
 
-// 改行(\n)・復帰(\r)・タブ(\t)以外の制御文字を除去する
+const LABELS = {
+  independence: {
+    independent: "ほぼひとりで遊べた",
+    some_help: "少し手助けが必要だった",
+    much_help: "かなり手助けが必要だった",
+  },
+  replay_interest: {
+    yes: "また遊びたがった",
+    unsure: "どちらともいえない",
+    no: "もう一度は遊びたがらなかった",
+  },
+  age_group: {
+    age_2_3: "2〜3歳",
+    age_4_5: "4〜5歳",
+    age_6_plus: "6歳以上",
+  },
+  help_areas: {
+    getting_started: "遊び始めるところ",
+    finding_same_car: "同じ車を見つけるところ",
+    tapping: "車をタップするところ",
+    waiting: "次の問題を待つところ",
+    other: "その他",
+  },
+};
+
 function stripControlChars(s) {
   return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
 }
@@ -39,12 +59,6 @@ function validateHelpAreas(value) {
   return { valid: true, normalized: value.length === 0 ? null : [...value] };
 }
 
-/**
- * 解析済みJSONボディを検証する。
- * 成功: { ok: true, data: { independence, replay_interest, age_group, help_areas, comment } }
- *   (未回答の任意項目は null。help_areas は null または文字列配列)
- * 失敗: { ok: false, fields: [問題のあったフィールド名] }
- */
 export function validateFeedback(body) {
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
     return { ok: false, fields: ["body"] };
@@ -111,6 +125,35 @@ function json(status, payload, extraHeaders = {}) {
   });
 }
 
+async function sendFeedbackEmail(data) {
+  const helpAreas = data.help_areas?.map((value) => LABELS.help_areas[value]).join("、") || "回答なし";
+  const payload = {
+    _subject: "【くるまどれかな？】新しい感想が届きました",
+    _template: "table",
+    _captcha: "false",
+    _url: "https://kuruma-dorekana.pages.dev/support",
+    "送信日時（UTC）": new Date().toISOString(),
+    "ひとりで遊べたか": LABELS.independence[data.independence],
+    "また遊びたがったか": LABELS.replay_interest[data.replay_interest],
+    "年齢": data.age_group ? LABELS.age_group[data.age_group] : "回答なし",
+    "手助けが必要だった場所": helpAreas,
+    "自由記述": data.comment || "なし",
+  };
+
+  const response = await fetch(FEEDBACK_EMAIL_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`feedback email failed: HTTP ${response.status}`);
+  }
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
 
@@ -142,7 +185,6 @@ export async function onRequest(context) {
 
   const { data } = result;
   try {
-    // submitted_at は列の DEFAULT (UTC) に任せるため INSERT には含めない
     await env.DB.prepare(
       "INSERT INTO feedback (independence, replay_interest, age_group, help_areas, comment) VALUES (?1, ?2, ?3, ?4, ?5)"
     )
@@ -158,6 +200,12 @@ export async function onRequest(context) {
     console.error("feedback insert failed:", err);
     return json(500, { ok: false, error: "server_error" });
   }
+
+  context.waitUntil(
+    sendFeedbackEmail(data).catch((err) => {
+      console.error("feedback email notification failed:", err);
+    })
+  );
 
   return json(201, { ok: true });
 }
