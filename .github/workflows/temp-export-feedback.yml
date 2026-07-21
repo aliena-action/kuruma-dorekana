@@ -1,0 +1,38 @@
+name: Temporary feedback export
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for protected export endpoint and download feedback
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://kuruma-dorekana.pages.dev/api/feedback-export?token=-jgBI8g5r5bA7p4JxRO64eMGT3054W0TGYjLlccXbwA'
+          for attempt in $(seq 1 36); do
+            status=$(curl --silent --show-error --location --output feedback.json --write-out '%{http_code}' "$url" || true)
+            if [ "$status" = "200" ] && jq -e '.ok == true' feedback.json >/dev/null 2>&1; then
+              jq . feedback.json > feedback.pretty.json
+              mv feedback.pretty.json feedback.json
+              exit 0
+            fi
+            echo "Attempt ${attempt}: HTTP ${status}"
+            sleep 10
+          done
+          echo 'Feedback export endpoint did not become ready.' >&2
+          cat feedback.json >&2 2>/dev/null || true
+          exit 1
+      - name: Upload feedback export
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedback-export
+          path: feedback.json
+          if-no-files-found: error
+          retention-days: 1
