@@ -1,0 +1,30 @@
+name: Temporary feedback email activation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger FormSubmit activation email
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            -X POST 'https://formsubmit.co/ajax/tokiabe@icloud.com' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            --data '{"_subject":"くるまどれかな？感想メール通知の有効化","_template":"table","_captcha":"false","_url":"https://kuruma-dorekana.pages.dev/support","内容":"今後、感想フォームに届いた内容をこのメールアドレスへ通知します。FormSubmitから届く確認メール内の有効化リンクを一度押してください。"}' \
+            | tee activation-response.json
+      - name: Upload activation response
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedback-email-activation-response
+          path: activation-response.json
+          if-no-files-found: error
+          retention-days: 1
