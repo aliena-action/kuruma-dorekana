@@ -17,15 +17,8 @@ function json(status, payload) {
   });
 }
 
-export async function onRequestPost({ request, env }) {
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return json(400, { ok: false });
-  }
-
-  if (typeof body?.token !== "string" || (await sha256Hex(body.token)) !== TOKEN_HASH) {
+async function exportFeedback(token, env) {
+  if (typeof token !== "string" || (await sha256Hex(token)) !== TOKEN_HASH) {
     return json(404, { ok: false });
   }
 
@@ -34,6 +27,21 @@ export async function onRequestPost({ request, env }) {
   ).all();
 
   return json(200, { ok: true, count: result.results.length, feedback: result.results });
+}
+
+export async function onRequestGet({ request, env }) {
+  const token = new URL(request.url).searchParams.get("token");
+  return exportFeedback(token, env);
+}
+
+export async function onRequestPost({ request, env }) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json(400, { ok: false });
+  }
+  return exportFeedback(body?.token, env);
 }
 
 export function onRequest() {
