@@ -362,6 +362,44 @@ test("同じ週のメールは1回だけ送信する", async (t) => {
   assert.equal(env.DB.runs.filter((run) => run.run_type === "weekly").length, 1);
 });
 
+test("動作確認メールは指定件名で送信し、同じ週の再送を防ぐ", async (t) => {
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    requests.push(JSON.parse(options.body));
+    return new Response(JSON.stringify({ id: "mail_test_subject" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  });
+  const env = adminEnv();
+  const subject = "【くるまどれかな？】感想レポート 動作確認";
+
+  const first = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly", subject }),
+    env,
+  });
+  assert.equal(first.status, 200);
+  assert.equal((await first.json()).status, "sent");
+  assert.equal(requests[0].subject, subject);
+
+  const second = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly", subject }),
+    env,
+  });
+  assert.equal((await second.json()).status, "already_sent");
+  assert.equal(requests.length, 1);
+});
+
+test("改行を含むメール件名を拒否する", async () => {
+  const env = adminEnv();
+  const res = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly", subject: "test\r\nBcc: other@example.com" }),
+    env,
+  });
+  assert.equal(res.status, 400);
+  assert.deepEqual(await res.json(), { ok: false, error: "invalid_subject" });
+});
+
 test("メール失敗を本文や秘密値なしで記録し、再試行可能にする", async (t) => {
   const logs = [];
   t.mock.method(console, "error", (...args) => logs.push(JSON.stringify(args)));
