@@ -1,5 +1,5 @@
 // node:test のみ使用(外部テストライブラリなし)
-// 実行: node --test tests/
+// 実行: node --test tests/*.test.js
 // 要件: Node.js 20.19+ / 22.7+(package.json なしで ES モジュール構文を自動判定するため)
 import { test } from "node:test";
 import assert from "node:assert/strict";

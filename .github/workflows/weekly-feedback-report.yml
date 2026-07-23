@@ -1,0 +1,56 @@
+name: Weekly feedback report
+
+on:
+  schedule:
+    # Every Monday at 09:00 JST. Change this cron to adjust the schedule.
+    - cron: "0 9 * * 1"
+      timezone: "Asia/Tokyo"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-feedback-report
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate report configuration
+        env:
+          REPORT_ENDPOINT: ${{ vars.FEEDBACK_REPORT_ENDPOINT }}
+          REPORT_ADMIN_TOKEN: ${{ secrets.REPORT_ADMIN_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$REPORT_ENDPOINT"
+          test -n "$REPORT_ADMIN_TOKEN"
+          [[ "$REPORT_ENDPOINT" == https://* ]]
+          [[ "$REPORT_ENDPOINT" != *\?* ]]
+          [[ "$REPORT_ENDPOINT" != *\#* ]]
+          [[ ${#REPORT_ADMIN_TOKEN} -ge 32 ]]
+
+      - name: Generate and send the weekly report
+        env:
+          REPORT_ENDPOINT: ${{ vars.FEEDBACK_REPORT_ENDPOINT }}
+          REPORT_ADMIN_TOKEN: ${{ secrets.REPORT_ADMIN_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(
+            curl --silent --show-error \
+              --output "$RUNNER_TEMP/feedback-report-result.json" \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer $REPORT_ADMIN_TOKEN" \
+              --header 'Content-Type: application/json' \
+              --data '{"action":"send_weekly"}' \
+              "$REPORT_ENDPOINT"
+          )"
+          if [[ "$status" != 2* ]]; then
+            echo "Weekly feedback report failed with HTTP $status."
+            exit 1
+          fi
+          echo "Weekly feedback report request completed."
