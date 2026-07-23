@@ -170,7 +170,21 @@ async function handleGenerate(body, env, now) {
   return format === "json" ? json(200, { ok: true, report }) : markdown(renderFeedbackReportMarkdown(report));
 }
 
-async function handleWeekly(env, now) {
+function requestedEmailSubject(body) {
+  if (!Object.hasOwn(body, "subject")) return null;
+  if (
+    typeof body.subject !== "string" ||
+    body.subject.length < 1 ||
+    body.subject.length > 200 ||
+    /[\r\n]/.test(body.subject)
+  ) {
+    throw new Error("invalid_subject");
+  }
+  return body.subject;
+}
+
+async function handleWeekly(body, env, now) {
+  const customSubject = requestedEmailSubject(body);
   const range = previousCompletedJstWeek(now);
   const key = reportKeyForWeekly(range.start, range.end);
   const claim = await claimWeeklyRun(env.DB, key, range.start, range.end);
@@ -190,7 +204,7 @@ async function handleWeekly(env, now) {
       apiKey: env.RESEND_API_KEY,
       from: env.REPORT_FROM_EMAIL,
       to: env.REPORT_TO_EMAIL || DEFAULT_TO_EMAIL,
-      subject: weeklyReportSubject(report),
+      subject: customSubject ?? weeklyReportSubject(report),
       markdown: reportMarkdown,
       idempotencyKey: key,
     });
@@ -241,12 +255,15 @@ export async function onRequest({ request, env }) {
     const now = env.REPORT_NOW ? new Date(env.REPORT_NOW) : new Date();
     if (Number.isNaN(now.getTime())) throw new Error("invalid_now");
     if (body.action === "generate") return await handleGenerate(body, env, now);
-    if (body.action === "send_weekly") return await handleWeekly(env, now);
+    if (body.action === "send_weekly") return await handleWeekly(body, env, now);
     if (body.action === "history") return json(200, { ok: true, history: await reportHistory(env.DB) });
     return json(400, { ok: false, error: "invalid_action" });
   } catch (error) {
     if (error?.message === "invalid_period") {
       return json(400, { ok: false, error: "invalid_period" });
+    }
+    if (error?.message === "invalid_subject") {
+      return json(400, { ok: false, error: "invalid_subject" });
     }
     console.error("feedback report request failed", { name: error?.name ?? "Error" });
     return json(500, { ok: false, error: "server_error" });
