@@ -1,0 +1,28 @@
+name: Temporary feedback export 2
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download feedback
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error --location \
+            'https://kuruma-dorekana.pages.dev/api/feedback-export?token=melii0e51qG4WOzsp8q2GBtQnq1PH8TXJaPmwaQwtdE' \
+            -o feedback.json
+          jq . feedback.json > feedback.pretty.json
+          mv feedback.pretty.json feedback.json
+      - name: Upload feedback
+        uses: actions/upload-artifact@v4
+        with:
+          name: feedback-export-2
+          path: feedback.json
+          retention-days: 1
