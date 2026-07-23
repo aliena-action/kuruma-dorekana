@@ -49,6 +49,16 @@ npx wrangler d1 migrations apply YOUR_D1_DATABASE_NAME --remote
 
 workflow権限は`contents: read`のみです。Cloudflare API tokenやD1管理権限はGitHub Actionsへ付与しません。
 
+## 本番有効化前チェック
+
+1. 本番D1へ `0002_create_feedback_report_runs.sql` を適用する
+2. Cloudflare PagesとGitHub Actionsへ上記のSecret/Variableを設定する
+3. Resendを介して感想本文をメール送信する運用が、公開中のprivacy本文と一致するか確認する
+4. `workflow_dispatch`で1回だけ手動実行し、`tokiabe@icloud.com`への到着とD1の`sent`履歴を確認する
+5. 同じ週に再実行して`already_sent`となり、二重メールが届かないことを確認する
+
+これらを確認するまでは、週次メールを本番稼働済みとして扱いません。
+
 ## オンデマンド取得
 
 トークンはURLではなく環境変数とAuthorizationヘッダーで渡します。コマンド出力だけにレポートを表示し、公開artifactやリポジトリへ保存しません。
