@@ -6,6 +6,11 @@ on:
     - cron: "0 9 * * 1"
       timezone: "Asia/Tokyo"
   workflow_dispatch:
+    inputs:
+      subject:
+        description: Optional subject for a one-off verification email
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -36,9 +41,18 @@ jobs:
         env:
           REPORT_ENDPOINT: ${{ vars.FEEDBACK_REPORT_ENDPOINT }}
           REPORT_ADMIN_TOKEN: ${{ secrets.REPORT_ADMIN_TOKEN }}
+          REPORT_SUBJECT: ${{ inputs.subject }}
         shell: bash
         run: |
           set -euo pipefail
+          payload='{"action":"send_weekly"}'
+          if [[ -n "$REPORT_SUBJECT" ]]; then
+            payload="$(
+              jq -cn \
+                --arg subject "$REPORT_SUBJECT" \
+                '{action:"send_weekly",subject:$subject}'
+            )"
+          fi
           status="$(
             curl --silent --show-error \
               --output "$RUNNER_TEMP/feedback-report-result.json" \
@@ -46,7 +60,7 @@ jobs:
               --request POST \
               --header "Authorization: Bearer $REPORT_ADMIN_TOKEN" \
               --header 'Content-Type: application/json' \
-              --data '{"action":"send_weekly"}' \
+              --data "$payload" \
               "$REPORT_ENDPOINT"
           )"
           if [[ "$status" != 2* ]]; then
