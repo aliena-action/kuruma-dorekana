@@ -37,6 +37,11 @@ async function digest(value) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
 }
 
+async function digestHex(value) {
+  const bytes = await digest(value);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 async function isAuthorized(request, expectedToken) {
   if (typeof expectedToken !== "string" || expectedToken.length < 32) return false;
   const header = request.headers.get("authorization") ?? "";
@@ -62,7 +67,7 @@ async function readJson(request) {
 async function loadFeedbackRows(db) {
   const result = await db
     .prepare(
-      "SELECT id, submitted_at, independence, replay_interest, age_group, help_areas, comment FROM feedback ORDER BY submitted_at ASC, id ASC"
+      "SELECT id, submitted_at, independence, replay_interest, age_group, help_areas, comment, is_test FROM feedback WHERE is_test = 0 ORDER BY submitted_at ASC, id ASC"
     )
     .all();
   return Array.isArray(result.results) ? result.results : [];
@@ -186,7 +191,10 @@ function requestedEmailSubject(body) {
 async function handleWeekly(body, env, now) {
   const customSubject = requestedEmailSubject(body);
   const range = previousCompletedJstWeek(now);
-  const key = reportKeyForWeekly(range.start, range.end);
+  const weeklyKey = reportKeyForWeekly(range.start, range.end);
+  const key = customSubject
+    ? `${weeklyKey}:subject:${await digestHex(customSubject)}`
+    : weeklyKey;
   const claim = await claimWeeklyRun(env.DB, key, range.start, range.end);
   if (!claim.claimed) return json(200, { ok: true, status: claim.status, reportKey: key });
 
