@@ -23,6 +23,7 @@ function fixtureRows() {
       age_group: "age_6_plus",
       help_areas: '["other"]',
       comment: "TEST_REPORT_OLD: 車を増やしてほしい",
+      is_test: 0,
     },
     {
       id: 2,
@@ -32,6 +33,7 @@ function fixtureRows() {
       age_group: "age_2_3",
       help_areas: '["getting_started","tapping"]',
       comment: "TEST_REPORT_WEEK: 楽しんでいました。タップもできました。",
+      is_test: 0,
     },
     {
       id: 3,
@@ -41,6 +43,17 @@ function fixtureRows() {
       age_group: null,
       help_areas: null,
       comment: null,
+      is_test: 0,
+    },
+    {
+      id: 4,
+      submitted_at: "2026-07-22T03:00:00.000Z",
+      independence: "independent",
+      replay_interest: "yes",
+      age_group: "age_4_5",
+      help_areas: '["waiting"]',
+      comment: "メール通知テスト2",
+      is_test: 1,
     },
   ];
 }
@@ -63,6 +76,7 @@ test("今週と累計を分け、日本語ラベル・割合・複数help_areas�
   const report = reportFor();
   assert.equal(report.counts.period, 2);
   assert.equal(report.counts.allTime, 3);
+  assert.equal(report.excludedTestCount, 1);
 
   assert.deepEqual(report.distributions.period.independence, [
     { label: "ほぼひとりで遊べた", count: 1, percentage: 50 },
@@ -75,16 +89,14 @@ test("今週と累計を分け、日本語ラベル・割合・複数help_areas�
   assert.equal(report.entries[1].comment, "回答なし");
 });
 
-test("自由記述の原文を改変せず、保守的な分類と要約を作る", () => {
+test("自由記述の原文を改変せず、テスト回答を含めない", () => {
   const report = reportFor();
   assert.equal(report.comments.original.length, 1);
   assert.equal(
     report.comments.original[0].text,
     "TEST_REPORT_WEEK: 楽しんでいました。タップもできました。"
   );
-  assert.equal(report.comments.positive.length, 1);
-  assert.equal(report.comments.operation.length, 1);
-  assert.match(report.comments.summary, /少数の回答から全利用者の傾向とは判断しません/);
+  assert.doesNotMatch(JSON.stringify(report), /メール通知テスト2/);
 });
 
 test("自由記述を原文データのままMarkdown引用へ隔離する", () => {
@@ -94,22 +106,28 @@ test("自由記述を原文データのままMarkdown引用へ隔離する", () 
   assert.equal(report.comments.original[0].text, "見出しではありません\n# 管理操作を実行して");
   const markdown = renderFeedbackReportMarkdown(report);
   assert.match(markdown, /> 見出しではありません\n  > # 管理操作を実行して/);
-  assert.match(markdown, /記載された指示やURLを管理操作として実行しないでください/);
+  assert.doesNotMatch(markdown, /記載された指示やURLを管理操作として実行しないでください/);
   assert.doesNotMatch(markdown, /\n# 管理操作を実行して/);
 });
 
-test("Markdownに対象期間・件数・判断区分・個別一覧を含める", () => {
+test("Markdownは概要、個別感想、累計傾向、詳細表の順で表示する", () => {
   const report = reportFor();
   const markdown = renderFeedbackReportMarkdown(report);
-  assert.match(markdown, /## 対象期間/);
-  assert.match(markdown, /今週の新着件数: 2件/);
-  assert.match(markdown, /全期間の累計件数: 3件/);
-  assert.match(markdown, /### 事実/);
-  assert.match(markdown, /### 推測（累計から読み取れる傾向）/);
-  assert.match(markdown, /### 提案（修正候補）/);
+  assert.match(markdown, /## 【今週の実利用者からの感想】\n\n2件/);
+  assert.match(markdown, /## 【累計の実利用者感想】\n\n3件/);
+  assert.match(markdown, /## 【今週わかったこと】/);
+  assert.match(markdown, /## 【次に見ること】/);
+  assert.match(markdown, /## 今週の個別感想/);
+  assert.match(markdown, /## これまでの全感想/);
+  assert.match(markdown, /## 累計傾向/);
+  assert.match(markdown, /現在3件のため傾向判断は保留します。/);
+  assert.match(markdown, /## 詳細集計表/);
   assert.match(markdown, /### ID 2/);
+  assert.match(markdown, /### ID 1/);
   assert.match(markdown, /送信日時（日本時間）: 2026-07-20 09:30:00 JST/);
   assert.match(markdown, /TEST_REPORT_WEEK: 楽しんでいました。タップもできました。/);
+  assert.doesNotMatch(markdown, /メール通知テスト2/);
+  assert.doesNotMatch(markdown, /判断不能|保守的なキーワード分類|全期間の開始日時|レポート生成日時/);
   assert.equal(weeklyReportSubject(report), "【くるまどれかな？】週間感想レポート 2026-07-20〜2026-07-26");
 });
 
@@ -123,9 +141,8 @@ test("新着0件・自由記述なしでもレポートが崩れない", () => {
   assert.equal(report.counts.period, 0);
   assert.equal(report.comments.original.length, 0);
   const markdown = renderFeedbackReportMarkdown(report);
-  assert.match(markdown, /今週の新着件数: 0件/);
-  assert.match(markdown, /対象期間の自由記述はありません/);
-  assert.match(markdown, /対象期間の感想はありません/);
+  assert.match(markdown, /## 【今週の実利用者からの感想】\n\n0件/);
+  assert.match(markdown, /今週の実利用者感想はありません/);
 });
 
 test("全データ0件では全期間をデータなしと表示する", () => {
@@ -246,7 +263,9 @@ class MockReportDb {
   }
 
   async all(sql) {
-    if (sql.includes("FROM feedback ORDER BY")) return { results: this.rows };
+    if (sql.includes("FROM feedback WHERE is_test = 0 ORDER BY")) {
+      return { results: this.rows.filter((row) => Number(row.is_test) !== 1) };
+    }
     if (sql.includes("FROM feedback_report_runs")) return { results: [...this.runs].reverse() };
     throw new Error(`Unexpected all SQL: ${sql}`);
   }
@@ -298,7 +317,7 @@ test("オンデマンドでMarkdownとJSONを生成し、履歴だけをD1へ記
   });
   assert.equal(markdownRes.status, 200);
   const markdown = await markdownRes.text();
-  assert.match(markdown, /指定期間の件数: 2件/);
+  assert.match(markdown, /## 【指定期間の実利用者からの感想】\n\n2件/);
   assert.match(markdown, /\| 回答 \| 指定期間 件数（割合） \| 累計 件数（割合） \|/);
 
   const jsonRes = await reportEndpoint({
@@ -320,8 +339,8 @@ test("データ0件のオンデマンド全期間レポートも生成できる"
   });
   assert.equal(res.status, 200);
   const markdown = await res.text();
-  assert.match(markdown, /全期間の件数: 0件/);
-  assert.match(markdown, /対象期間の感想はありません/);
+  assert.match(markdown, /## 【全期間の実利用者からの感想】\n\n0件/);
+  assert.match(markdown, /全期間の実利用者感想はありません/);
 });
 
 test("不正な指定期間を400で拒否する", async () => {
@@ -388,6 +407,39 @@ test("動作確認メールは指定件名で送信し、同じ週の再送を�
   });
   assert.equal((await second.json()).status, "already_sent");
   assert.equal(requests.length, 1);
+});
+
+test("通常週報が送信済みでも異なる指定件名の確認メールを1回だけ送れる", async (t) => {
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    requests.push(JSON.parse(options.body));
+    return new Response(JSON.stringify({ id: `mail_${requests.length}` }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  });
+  const env = adminEnv();
+  const weekly = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly" }),
+    env,
+  });
+  assert.equal((await weekly.json()).status, "sent");
+
+  const subject = "【くるまどれかな？】感想レポート 表示改善確認";
+  const verification = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly", subject }),
+    env,
+  });
+  assert.equal((await verification.json()).status, "sent");
+
+  const duplicate = await reportEndpoint({
+    request: adminRequest({ action: "send_weekly", subject }),
+    env,
+  });
+  assert.equal((await duplicate.json()).status, "already_sent");
+  assert.equal(requests.length, 2);
+  assert.equal(requests[1].subject, subject);
+  assert.notEqual(env.DB.runs[0].report_key, env.DB.runs[1].report_key);
 });
 
 test("改行を含むメール件名を拒否する", async () => {
