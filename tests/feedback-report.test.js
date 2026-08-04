@@ -58,6 +58,53 @@ function fixtureRows() {
   ];
 }
 
+function fixtureSessions() {
+  return [
+    {
+      id: 1,
+      first_seen_at: "2026-07-20T00:15:00.000Z",
+      last_seen_at: "2026-07-20T00:19:00.000Z",
+      support_viewed: 1,
+      support_play_clicked: 1,
+      game_page_opened: 1,
+      game_started: 1,
+      first_choice_tapped: 1,
+      correct_tap_count: 3,
+      wrong_tap_count: 2,
+      completed_round_count: 3,
+      rare_car_shown_count: 1,
+      rare_car_interaction_count: 1,
+      visible_play_ms: 240000,
+      interaction_span_ms: 180000,
+      return_status: "first_time",
+      return_interval_bucket: "first_time",
+      source_code: "support",
+      is_test: 0,
+    },
+    {
+      id: 2,
+      first_seen_at: "2026-07-21T03:00:00.000Z",
+      last_seen_at: "2026-07-21T03:01:00.000Z",
+      support_viewed: 0,
+      support_play_clicked: 0,
+      game_page_opened: 1,
+      game_started: 1,
+      first_choice_tapped: 1,
+      correct_tap_count: 1,
+      wrong_tap_count: 0,
+      completed_round_count: 1,
+      rare_car_shown_count: 0,
+      rare_car_interaction_count: 0,
+      visible_play_ms: 60000,
+      interaction_span_ms: 30000,
+      return_status: "returning",
+      return_interval_bucket: "1_7_days",
+      source_code: "x",
+      is_test: 0,
+    },
+  ];
+}
+
 const WEEK = {
   start: new Date("2026-07-19T15:00:00.000Z"),
   end: new Date("2026-07-26T15:00:00.000Z"),
@@ -190,9 +237,11 @@ test("メール本文を人間向けMarkdownとしてResendへ渡す", async () 
 });
 
 class MockReportDb {
-  constructor(rows = fixtureRows()) {
+  constructor(rows = fixtureRows(), sessions = fixtureSessions()) {
     this.rows = rows;
+    this.sessions = sessions;
     this.runs = [];
+    this.measurementStartedAt = "2026-07-01T00:00:00.000Z";
   }
 
   prepare(sql) {
@@ -203,6 +252,9 @@ class MockReportDb {
       },
       async all() {
         return db.all(sql);
+      },
+      async first() {
+        return db.first(sql);
       },
     };
     return statement;
@@ -267,7 +319,15 @@ class MockReportDb {
       return { results: this.rows.filter((row) => Number(row.is_test) !== 1) };
     }
     if (sql.includes("FROM feedback_report_runs")) return { results: [...this.runs].reverse() };
+    if (sql.includes("FROM play_sessions")) {
+      return { results: this.sessions.filter((row) => Number(row.is_test) !== 1) };
+    }
     throw new Error(`Unexpected all SQL: ${sql}`);
+  }
+
+  async first(sql) {
+    if (sql.includes("FROM analytics_metadata")) return { value: this.measurementStartedAt };
+    throw new Error(`Unexpected first SQL: ${sql}`);
   }
 }
 
@@ -317,8 +377,9 @@ test("オンデマンドでMarkdownとJSONを生成し、履歴だけをD1へ記
   });
   assert.equal(markdownRes.status, 200);
   const markdown = await markdownRes.text();
-  assert.match(markdown, /## 【指定期間の実利用者からの感想】\n\n2件/);
-  assert.match(markdown, /\| 回答 \| 指定期間 件数（割合） \| 累計 件数（割合） \|/);
+  assert.match(markdown, /## 【今週の利用】/);
+  assert.match(markdown, /ゲームページ表示：2回/);
+  assert.match(markdown, /## 実利用者からの新しい感想/);
 
   const jsonRes = await reportEndpoint({
     request: adminRequest({ action: "generate", format: "json" }),
@@ -326,21 +387,21 @@ test("オンデマンドでMarkdownとJSONを生成し、履歴だけをD1へ記
   });
   assert.equal(jsonRes.status, 200);
   const payload = await jsonRes.json();
-  assert.equal(payload.report.counts.allTime, 3);
+  assert.equal(payload.report.metrics.cumulative.sessionCount, 2);
   assert.equal(env.DB.runs.length, 2);
   assert.ok(env.DB.runs.every((run) => !("comment" in run)));
 });
 
 test("データ0件のオンデマンド全期間レポートも生成できる", async () => {
-  const env = adminEnv(new MockReportDb([]));
+  const env = adminEnv(new MockReportDb([], []));
   const res = await reportEndpoint({
     request: adminRequest({ action: "generate", format: "markdown" }),
     env,
   });
   assert.equal(res.status, 200);
   const markdown = await res.text();
-  assert.match(markdown, /## 【全期間の実利用者からの感想】\n\n0件/);
-  assert.match(markdown, /全期間の実利用者感想はありません/);
+  assert.match(markdown, /## 【今週の利用】/);
+  assert.match(markdown, /今週は新しい利用セッションがありませんでした/);
 });
 
 test("不正な指定期間を400で拒否する", async () => {

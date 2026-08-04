@@ -1,10 +1,12 @@
 import {
-  buildFeedbackReport,
   previousCompletedJstWeek,
-  renderFeedbackReportMarkdown,
-  weeklyReportSubject,
 } from "../../lib/feedback-report.js";
 import { sendFeedbackReportEmail } from "../../lib/feedback-report-mail.js";
+import {
+  buildUsageReport,
+  renderUsageReportMarkdown,
+  weeklyUsageReportSubject,
+} from "../../lib/usage-report.js";
 
 const MAX_BODY_BYTES = 2048;
 const DEFAULT_TO_EMAIL = "tokiabe@icloud.com";
@@ -73,6 +75,29 @@ async function loadFeedbackRows(db) {
   return Array.isArray(result.results) ? result.results : [];
 }
 
+async function loadPlaySessionRows(db) {
+  const result = await db
+    .prepare(
+      `SELECT id, first_seen_at, last_seen_at, support_viewed, support_play_clicked,
+        game_page_opened, game_started, first_choice_tapped, correct_tap_count,
+        wrong_tap_count, completed_round_count, rare_car_shown_count,
+        rare_car_interaction_count, visible_play_ms, interaction_span_ms,
+        return_status, return_interval_bucket, source_code, is_test
+       FROM play_sessions
+       WHERE is_test = 0
+       ORDER BY first_seen_at ASC, id ASC`
+    )
+    .all();
+  return Array.isArray(result.results) ? result.results : [];
+}
+
+async function loadMeasurementStartedAt(db) {
+  const row = await db
+    .prepare("SELECT value FROM analytics_metadata WHERE key = 'measurement_started_at'")
+    .first();
+  return typeof row?.value === "string" ? row.value : null;
+}
+
 function parseBoundary(value, { endOfDay = false } = {}) {
   if (typeof value !== "string" || value.length > 40) throw new Error("invalid_period");
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -104,7 +129,7 @@ function requestedRange(body, rows, now) {
     if (start.getTime() >= end.getTime()) throw new Error("invalid_period");
     return { start, end, name: "指定期間" };
   }
-  const first = rows.length > 0 ? new Date(rows[0].submitted_at) : new Date(now.getTime() - 1);
+  const first = rows.length > 0 ? new Date(rows[0].first_seen_at) : new Date(now.getTime() - 1);
   return { start: first, end: now, name: "全期間" };
 }
 
@@ -163,16 +188,21 @@ async function reportHistory(db) {
 async function handleGenerate(body, env, now) {
   const format = body.format ?? "markdown";
   if (!["markdown", "json"].includes(format)) return json(400, { ok: false, error: "invalid_format" });
-  const rows = await loadFeedbackRows(env.DB);
-  const range = requestedRange(body, rows, now);
-  const report = buildFeedbackReport(rows, {
+  const [sessions, feedback, measurementStartedAt] = await Promise.all([
+    loadPlaySessionRows(env.DB),
+    loadFeedbackRows(env.DB),
+    loadMeasurementStartedAt(env.DB),
+  ]);
+  const range = requestedRange(body, sessions, now);
+  const report = buildUsageReport(sessions, feedback, {
     periodStart: range.start,
     periodEnd: range.end,
     generatedAt: now,
     periodName: range.name,
+    measurementStartedAt,
   });
   await recordOnDemandRun(env.DB, range.start, range.end, format);
-  return format === "json" ? json(200, { ok: true, report }) : markdown(renderFeedbackReportMarkdown(report));
+  return format === "json" ? json(200, { ok: true, report }) : markdown(renderUsageReportMarkdown(report));
 }
 
 function requestedEmailSubject(body) {
@@ -198,21 +228,26 @@ async function handleWeekly(body, env, now) {
   const claim = await claimWeeklyRun(env.DB, key, range.start, range.end);
   if (!claim.claimed) return json(200, { ok: true, status: claim.status, reportKey: key });
 
-  const rows = await loadFeedbackRows(env.DB);
-  const report = buildFeedbackReport(rows, {
+  const [sessions, feedback, measurementStartedAt] = await Promise.all([
+    loadPlaySessionRows(env.DB),
+    loadFeedbackRows(env.DB),
+    loadMeasurementStartedAt(env.DB),
+  ]);
+  const report = buildUsageReport(sessions, feedback, {
     periodStart: range.start,
     periodEnd: range.end,
     generatedAt: now,
     periodName: "今週",
+    measurementStartedAt,
   });
-  const reportMarkdown = renderFeedbackReportMarkdown(report);
+  const reportMarkdown = renderUsageReportMarkdown(report);
 
   try {
     const sent = await sendFeedbackReportEmail({
       apiKey: env.RESEND_API_KEY,
       from: env.REPORT_FROM_EMAIL,
       to: env.REPORT_TO_EMAIL || DEFAULT_TO_EMAIL,
-      subject: customSubject ?? weeklyReportSubject(report),
+      subject: customSubject ?? weeklyUsageReportSubject(report),
       markdown: reportMarkdown,
       idempotencyKey: key,
     });
@@ -226,8 +261,8 @@ async function handleWeekly(body, env, now) {
       ok: true,
       status: "sent",
       reportKey: key,
-      newCount: report.counts.period,
-      totalCount: report.counts.allTime,
+      newCount: report.metrics.period.sessionCount,
+      totalCount: report.metrics.cumulative.sessionCount,
     });
   } catch (error) {
     await env.DB

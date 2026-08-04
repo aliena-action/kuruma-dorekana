@@ -43,6 +43,18 @@ h1{margin:0;font-size:clamp(1.9rem,8vw,2.4rem);line-height:1.3;letter-spacing:0}
     </ul>
   </section>
 
+  <section class="section" aria-labelledby="privacyAnalytics">
+    <h2 id="privacyAnalytics">匿名の利用状況について</h2>
+    <p>ゲームを遊びやすく改善するため、個人を特定しない最小限の利用状況を集計します。</p>
+    <ul>
+      <li>ページ表示、ゲーム開始、選択肢の操作、正解・不正解の回数、完了した問題数、レアカーの表示・操作、画面表示中のプレイ時間、再利用の区分、許可された流入元の分類を取り扱います。</li>
+      <li>名前、連絡先、正確な位置情報、端末固有識別子、完全な参照元URLは取得しません。</li>
+      <li>アプリケーション側でIPアドレスやUser-Agentをデータベースへ保存しません。</li>
+      <li>広告配信、個人の特定、端末をまたいだ追跡には利用しません。</li>
+      <li>Google Analyticsなどの外部広告・行動分析サービスは使用しません。</li>
+    </ul>
+  </section>
+
   <section class="section" aria-labelledby="privacyFeedback">
     <h2 id="privacyFeedback">感想について</h2>
     <p>いただいた感想は、遊びやすさや今後の開発の参考に使用します。</p>
@@ -70,12 +82,17 @@ h1{margin:0;font-size:clamp(1.9rem,8vw,2.4rem);line-height:1.3;letter-spacing:0}
 
   <section class="section" aria-labelledby="privacyStorage">
     <h2 id="privacyStorage">端末内への保存</h2>
-    <p>ホーム画面追加案内を閉じた状態を、お使いの端末のlocalStorageに保存します。この情報は個人の特定には使用しません。</p>
+    <p>ホーム画面追加案内を閉じた状態に加え、過去にゲームを開始したことがあるか、最後にゲームを開始した日を、お使いの端末のlocalStorageに保存します。同一タブ内のページ遷移をまとめる一時IDはsessionStorageに保存し、タブを閉じると失われます。これらは個人の特定には使用しません。</p>
+  </section>
+
+  <section class="section" aria-labelledby="privacyRetention">
+    <h2 id="privacyRetention">保存期間</h2>
+    <p>匿名の利用状況は、ゲーム改善の比較に必要な期間として原則24か月を目安に保存し、必要がなくなった情報は削除または個別セッションを識別できない集計値へ変更します。</p>
   </section>
 
   <section class="section" aria-labelledby="privacyServices">
     <h2 id="privacyServices">外部サービス</h2>
-    <p>サイトの提供にCloudflareを利用し、ギフト機能の公開時にはStripeを利用する予定です。各サービスでは、それぞれのプライバシーポリシーが適用されます。</p>
+    <p>サイトの提供と匿名利用状況の保存にCloudflareを利用し、ギフト機能の公開時にはStripeを利用する予定です。各サービスでは、それぞれのプライバシーポリシーが適用されます。外部の広告・行動分析サービスは利用しません。</p>
   </section>
 
   <section class="section" aria-labelledby="privacyAddress">
@@ -83,10 +100,10 @@ h1{margin:0;font-size:clamp(1.9rem,8vw,2.4rem);line-height:1.3;letter-spacing:0}
     <a class="contact" href="mailto:tokiabe@icloud.com">tokiabe@icloud.com</a>
   </section>
 
-  <p class="date">制定日：2026年7月</p>
+  <p class="date">制定日：2026年7月<br>改定日：2026年8月</p>
   <a class="back" href="./support.html">「くるまどれかな？」へ戻る</a>
 </main>
 
-<!-- 公開前に、感想の保存項目・Stripe決済処理・Cloudflareでのデータ処理と本文を再照合すること。 -->
+<!-- 公開前に、感想・匿名利用状況の保存項目、Stripe決済処理、Cloudflareでのデータ処理と本文を再照合すること。 -->
 </body>
 </html>

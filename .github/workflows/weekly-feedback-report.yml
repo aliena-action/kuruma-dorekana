@@ -1,4 +1,4 @@
-name: Weekly feedback report
+name: Weekly usage report
 
 on:
   schedule:
@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: weekly-feedback-report
+  group: weekly-usage-report
   cancel-in-progress: false
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
           [[ "$REPORT_ENDPOINT" != *\#* ]]
           [[ ${#REPORT_ADMIN_TOKEN} -ge 32 ]]
 
-      - name: Generate and send the weekly report
+      - name: Generate and send the weekly usage report
         env:
           REPORT_ENDPOINT: ${{ vars.FEEDBACK_REPORT_ENDPOINT }}
           REPORT_ADMIN_TOKEN: ${{ secrets.REPORT_ADMIN_TOKEN }}
@@ -64,7 +64,7 @@ jobs:
               "$REPORT_ENDPOINT"
           )"
           if [[ "$status" != 2* ]]; then
-            echo "Weekly feedback report failed with HTTP $status."
+            echo "Weekly usage report failed with HTTP $status."
             exit 1
           fi
-          echo "Weekly feedback report request completed."
+          echo "Weekly usage report request completed."
