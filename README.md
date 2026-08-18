@@ -11,6 +11,13 @@ Files:
 GitHub Pages target:
 https://aliena-action.github.io/kuruma-dorekana/
 
+## Copyright and use
+
+Copyright in this game and its original content is reserved. Normal gameplay and
+sharing links to an official publication are permitted; copying, redistributing,
+republishing, modifying, selling, or extracting game assets without prior written
+permission is prohibited. See [COPYRIGHT.txt](COPYRIGHT.txt) for the complete notice.
+
 ## Feedback storage and reports
 
 - The parent feedback form posts to `POST /api/feedback`.
