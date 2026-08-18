@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="author" content="Ryuca">
+<meta name="copyright" content="© 2026 Ryuca. All rights reserved.">
 <link rel="icon" href="data:,">
 <title>くるまどれかな？</title>
 <style>
@@ -94,6 +96,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 .fade{opacity:.25;transform:scale(.88);transition:.3s}
 .choice.guestGone{pointer-events:none}
 .spark{position:absolute;font-size:clamp(22px,5vw,40px);animation:spark .8s ease-out forwards;pointer-events:none}
+.copyrightNotice{position:absolute;z-index:10;right:max(8px,env(safe-area-inset-right));bottom:max(4px,env(safe-area-inset-bottom));color:rgba(55,60,50,.7);font-size:clamp(8px,1.5vw,11px);font-weight:700;line-height:1;letter-spacing:.02em;pointer-events:none}
 .rotate{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center;text-align:center;background:#fffdf6;font-size:7vw;font-weight:900}
 @media(max-height:360px) and (orientation:landscape){.openingLogoFallback{width:min(66vw,420px)}}
 @media(orientation:portrait){.rotate{display:flex}.app{filter:blur(3px)}}
@@ -127,7 +130,7 @@ body{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;color
 <div class="app" id="app">
 <section class="screen title" id="title"><div class="openingStage"><div class="openingTitlePosition"><div class="openingTitleExit" id="openingTitleExit"><div class="openingTitleMerge" id="openingTitleMerge"><h1 class="openingGlyphs" id="openingGlyphs" aria-label="くるまどれかな？"><span class="openingGlyph" style="--delay:0ms"><img src="assets/animation/opening/title_01_ku.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:105ms"><img src="assets/animation/opening/title_02_ru.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:210ms"><img src="assets/animation/opening/title_03_ma.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:315ms"><img src="assets/animation/opening/title_04_do.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:420ms"><img src="assets/animation/opening/title_05_re.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:525ms"><img src="assets/animation/opening/title_06_ka.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:630ms"><img src="assets/animation/opening/title_07_na.png" alt="" draggable="false" onerror="this.style.display='none'"></span><span class="openingGlyph" style="--delay:735ms"><img src="assets/animation/opening/title_08_question.png" alt="" draggable="false" onerror="this.style.display='none'"></span></h1><img class="openingLogoFallback" id="openingLogoFallback" src="assets/logo_kuruma_dorekana.png" alt="くるまどれかな？" draggable="false" onerror="this.hidden=true"></div></div></div><div class="openingCarPosition"><div class="openingCarExit" id="openingCarExit"><button class="openingStartCar" id="start" type="button" aria-label="ゲームをはじめる" disabled></button></div></div></div></section>
 <section class="screen play hide" id="play"><div class="playViewport" id="playViewport"><div class="playStage" id="playStage"><div class="sampleLane"><div class="sample" id="sample"></div></div><div class="choiceLane" id="choices"></div></div></div></section>
-</div><div class="rotate">📱↻<br>よこむきに してね</div>
+</div><p class="copyrightNotice">© 2026 Ryuca</p><div class="rotate">📱↻<br>よこむきに してね</div>
 <script src="assets/play-analytics.js" data-page="game"></script>
 <script>
 const cars=[
