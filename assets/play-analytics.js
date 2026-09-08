@@ -14,6 +14,38 @@
   const querySource = SOURCE_CODES.has(params.get("src")) ? params.get("src") : "unknown";
   const queryIsTest = params.get("analytics_test") === "1" || params.has("debug") || localHost || navigator.webdriver === true;
 
+  function enableAnyOrientationGame() {
+    if (page !== "game") return;
+
+    const style = document.createElement("style");
+    style.textContent = ".rotate{display:none!important}@media(orientation:portrait){.app{filter:none!important}}";
+    document.head.appendChild(style);
+
+    const activate = () => {
+      try {
+        if (typeof window.openingIsPortrait === "function") window.openingIsPortrait = () => false;
+        if (typeof window.handleOpeningOrientation === "function") window.handleOpeningOrientation();
+        if (typeof window.requestPlayStageLayout === "function") window.requestPlayStageLayout();
+      } catch {}
+    };
+
+    const activateAfterLoad = () => {
+      activate();
+      setTimeout(activate, 150);
+      setTimeout(activate, 500);
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", activateAfterLoad, { once: true });
+    } else {
+      activateAfterLoad();
+    }
+    window.addEventListener("pageshow", activateAfterLoad);
+    window.addEventListener("orientationchange", activateAfterLoad);
+  }
+
+  enableAnyOrientationGame();
+
   function freshState() {
     return {
       session_id: crypto.randomUUID(),
